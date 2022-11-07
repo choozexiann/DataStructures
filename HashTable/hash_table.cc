@@ -294,5 +294,6 @@ int main() {
     printf(std::to_string(test->IsEmpty()).c_str());
     printf(std::to_string(test->GetValue(2)).c_str());
     test->Display();
+    delete test;
     return 0;
 }
