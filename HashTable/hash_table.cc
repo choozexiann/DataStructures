@@ -32,13 +32,13 @@ public:
     V value_;
 };
 
-//  [HashNode] parameterized constructor
+//  HashNode parameterized constructor
 template <typename K, typename V>
 HashNode<K,V>::HashNode(K key, V value) : key_(key), value_(value) {}
 
 // MARK: HASHMAP CLASS ==========================================================================================================================
 
-// [HashMap] class which is the actual collection of HashNodes
+// HashNode class which is a collection of HashNodes
 template <typename K, typename V>
 class HashMap {
 public:
@@ -157,6 +157,7 @@ void HashMap<K,V>::Grow(){
 // Inserts a key value pair
 template<typename K, typename V>
 void HashMap<K,V>::InsertNode (K key, V value) {
+
     // Calls Grow() function if requires resize
     if (size_ == capacity_) { Grow(); }
 
@@ -166,6 +167,7 @@ void HashMap<K,V>::InsertNode (K key, V value) {
     // linear probing for free space
     bool inserted = false;
     while (!inserted) {
+
         // check for empty 
         if (arr_[hash_index] != nullptr) {
 
@@ -275,7 +277,10 @@ void HashMap<K,V>::Display(){
     printf("\n");
 }
 
-// MARK: MAIN ==========================================================================================================================
+
+
+
+
 int main() {
     HashMap<int, int> *test = new HashMap<int, int>();
     test->InsertNode(1,1);
