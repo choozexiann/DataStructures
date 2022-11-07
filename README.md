@@ -1,3 +1,3 @@
 # DataStructures
-## Implemented DataStructures in CPP
+## Implemented DataStructures in C++
 1. HashTable
