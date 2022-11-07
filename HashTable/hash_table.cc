@@ -158,8 +158,8 @@ void HashMap<K,V>::Grow(){
 template<typename K, typename V>
 void HashMap<K,V>::InsertNode (K key, V value) {
 
-    // Calls Grow() function if requires resize
-    if (size_ == capacity_) { Grow(); }
+    // Calls Grow() function to keep load factor low
+    if (size_ == static_cast<unsigned int> (capacity_*0.7)) { Grow(); }
 
     // Call HashFunction to generate index
     unsigned int hash_index = HashFunction(key);
@@ -287,7 +287,10 @@ int main() {
     test->InsertNode(2,2);
     test->InsertNode(2,3);
     test->InsertNode(3,6);
-    test->InsertNode(5,7);
+    test->InsertNode(1,1);
+    test->InsertNode(2,2);
+    test->InsertNode(2,3);
+    test->InsertNode(3,6);
     test->Display();
     printf(std::to_string(test->Size()).c_str());
     printf(std::to_string(test->DeleteNode(2)).c_str());
