@@ -1,18 +1,31 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
 
+/*
+HashMap that utilizes a 2D array to store items.
+Uses Modulo Hash function. i.e. hash_index = key % capactiy_
+Linear Probing uses: hash_index++;  hash_index %= capactiy_;
+Default Capacity Growth Rate and Max Load Factor are 2 and 0.7 respectively
+*/
 
 /*
-to implement:
-1. templated class HashNode - node in hashmap
-2. templated class HashMap - initialzed with inital cap of like 20?
-3. hashfunction() function - to gain index 
-4. insertnode() funciton
-5. deletenode() funcion
-6. V get(int key) - searches for value 
-7. SizeofMap()
-8. isEmpty()
-9. void display()
+Implemented Functions for HashMap:
+===== Constructors =====
+    HashMap<K,V>::HashMap(unsigned int capacity, unsigned int size, unsigned int capacity_growth, double load_factor);
+    Copy Assignment
+
+===== Public Member Functions =====
+    unsigned int HashFunction(K key);
+    void InsertNode (K key, V value);
+    V DeleteNode (K key);
+    V GetValue (K key);
+
+    bool IsEmpty() const { return size_ == 0; }
+    unsigned int Size() const { return size_; }
+    void SetCapactiyGrowthRate(unsigned int new_rate) { kCapacityGrowthFactor = new_rate; }
+    void SetLoadFactor(double new_factor) { kMaxLoadFactor = new_factor; }
+
+    void Display();
 */
 
 #include <stdexcept>
@@ -20,7 +33,6 @@ to implement:
 #include <string>
 
 // MARK: HASHNODE CLASS ==========================================================================================================================
-
 
 template <typename K, typename V>
 class HashNode {
