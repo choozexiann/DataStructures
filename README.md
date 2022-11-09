@@ -1,3 +1,3 @@
 # DataStructures
 ## Implemented DataStructures in C++
-1. HashTable / HashMap
+1. HashTable / HashMap with 2D array implementation
