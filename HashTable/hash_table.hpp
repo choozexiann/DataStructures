@@ -212,7 +212,7 @@ void HashMap<K,V>::Grow(){
 
     // initializes new array of capacity_ * capacity growth factor.
     HashNode<K,V>** temp_arr = new HashNode<K,V>* [capacity_ * kCapacityGrowthFactor];
-    for (unsigned int i = 0 ; i < capacity_ * 2; i++) { temp_arr[i] = nullptr; }
+    for (unsigned int i = 0 ; i < capacity_ * kCapacityGrowthFactor; i++) { temp_arr[i] = nullptr; }
 
     // transfers pointers old arr to new arr
     for (unsigned int i = 0 ; i < capacity_; i++) { 
@@ -227,7 +227,7 @@ void HashMap<K,V>::Grow(){
     temp_arr = nullptr;
 
     // update private members
-    capacity_ = capacity_ * 2;
+    capacity_ = capacity_ * kCapacityGrowthFactor;
 }
 
 // Inserts a key value pair
