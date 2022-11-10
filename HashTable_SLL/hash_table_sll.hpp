@@ -37,8 +37,9 @@ Implemented Functions for HashMap:
 template <typename K, typename V>
 class HashNode {
 public:
-    // constructors and destructors
+    // constructors
     HashNode<K,V>() = default;
+    HashNode<K,V>(const HashNode<K,V>& source);
     HashNode<K,V>& operator= (const HashNode<K,V>& source);
     ~HashNode<K,V>() = default;
 
@@ -47,7 +48,14 @@ public:
 
     K key_;
     V value_;
+    HashNode<K,V>* next_ = nullptr;
 };
+
+// HashNode Copy Constructor
+template <typename K, typename V>
+HashNode<K,V>::HashNode(const HashNode<K,V>& source) {
+    *this = source;
+}
 
 // HashNode Copy Assignment Constructor 
 template <typename K, typename V>
@@ -56,7 +64,7 @@ HashNode<K,V>& HashNode<K,V>::operator=(const HashNode<K,V>& source) {
     // check and return if lhs == rhs
     if (this == &source) { return *this; }
 
-    // copy over private members
+    // copy over private members - we do not copy over next_ as it is meaningless.
     key_ = source->key_;
     value_ = source->value_;
 
@@ -66,6 +74,123 @@ HashNode<K,V>& HashNode<K,V>::operator=(const HashNode<K,V>& source) {
 //  HashNode parameterized constructor
 template <typename K, typename V>
 HashNode<K,V>::HashNode(K key, V value) : key_(key), value_(value) {}
+
+// MARK: NODESLL CLASS ==========================================================================================================================
+
+template <typename K, typename V>
+class NodeSLL {
+public:
+
+    // ===== CONSTRUCTORS AND DESTRUCTORS =====
+    NodeSLL() = default;
+    NodeSLL(const NodeSLL<K,V>& source);
+    NodeSLL<K,V>& operator=(const NodeSLL<K,V>& source);
+    ~NodeSLL();
+
+    // ===== PUBLIC MEMBER FUNCTIONS =====
+    void Clear();
+
+    // Insertion of node into SLL 
+    void InsertNode(HashNode<K,V>* input_node);
+    void InsertNode(K key, V value);
+
+private:
+    HashNode<K,V>* root_ = nullptr;
+    unsigned int size_ = 0;
+};
+
+
+// Insertion of node into SLL when given node.
+template <typename K, typename V>
+void NodeSLL<K,V>::InsertNode(HashNode<K,V>* input_node) {
+
+    // if root_ is nullptr, becomes root_
+    if (root_ == nullptr) { root_ = input_node; return; }
+
+    // iterate down SLL and find leaf
+    HashNode<K,V>* curr_node = root_;
+    while(curr_node->next_ != nullptr) { curr_node = curr_node->next; }
+
+    // insert node into curr_node->next_
+    curr_node->next = input_node;
+
+    // increment size_
+    size_++;
+}
+
+// Insertion of node into SLL by creating new node
+template <typename K, typename V>
+void NodeSLL<K,V>::InsertNode(K key, V value) {
+
+    // create new node
+    HashNode<K,V>* new_node = new HashNode(key, value);
+
+    // call function that inserts a node.
+    InsertNode(new_node);
+}
+
+// NodeSLL Copy Constructor
+template <typename K, typename V>
+NodeSLL<K,V>::NodeSLL<K,V>(const NodeSLL<K,V>& source) {
+	*this = source;
+}
+
+// NodeSLL Copy Assignment Constructor 
+template <typename K, typename V>
+NodeSLL<K,V>& NodeSLL<K,V>::operator=(const NodeSLL<K,V>& source) {
+
+    // check and return if lhs == rhs
+    if (this == &source) { return *this; }
+
+    // clears this NodeSLL
+    Clear();
+
+    // deep copy of Nodes - start with copying over the root_
+    // check for nullptr root
+    if (source.root_ == nullptr) { return *this; }
+
+    // deep copy root
+    HashNode<K,V>* root_ = new HashNode<K,V>(source->root_);
+
+    // iterate through source SLL and continuously deepcopy
+    HashNode<K,V>* source_curr_node = source->root_->next_;
+    HashNode<K,V>* this_curr_node = source->root_->next_;
+
+    while (source_curr_node != nullptr) {
+        HashNode<K,V>* temp = new HashNode<K,V>(source_curr_node);
+
+        // update curr_node's next field
+        this_curr_node->next_ = temp;
+
+        // increment current node
+        this_curr_node = temp;
+    }
+
+    // copy over private members.
+    unsigned int size_ = source->size_;
+
+    return *this;
+}
+
+
+// Helper function for Destructor
+template <typename K, typename V>
+void NodeSLL<K,V>::Clear() {
+    HashNode<K,V>* head = root_;
+
+    // iteratively deletes HashNodes as it progresses through SLL
+    while (head) {
+        HashNode<K,V>* temp = head->next_;
+        delete head;
+        head = temp;
+    }
+
+    // removes dangling pointer
+    root_ = nullptr;
+
+    // restores size as 0
+    size_ = 0;
+}
 
 // MARK: HASHMAP CLASS ==========================================================================================================================
 
@@ -83,6 +208,7 @@ public:
     // ===== PUBLIC MEMBER FUNCTIONS =====
     unsigned int HashFunction(K key);
     void InsertNode (K key, V value);
+    void InsertNode (HashNode<K,V>* input_node);
     V DeleteNode (K key);
     V GetValue (K key);
 
