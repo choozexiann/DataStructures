@@ -1,4 +1,4 @@
-#include "hash_table.hpp"
+#include "hash_table_sll.hpp"
 
 // Informal Tests for the HashTable class
 int main() {
