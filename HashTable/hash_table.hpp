@@ -199,11 +199,11 @@ void HashMap<K,V>::Clear() {
 template<typename K, typename V>
 unsigned int HashMap<K,V>::HashFunction(K key) {
 
-    // Throw error if unable to carry out modulo
-    try { unsigned int res = key % capacity_; return res; }
-    catch (...) { throw std::runtime_error("Invalid key for modulo hash func! (most likely you entered a 0 as a key)"); }
-    
-    return 0;
+    // returns 0 if the key is 0 to avoid modulo UB.
+    if (key == 0) { return 0; }
+
+    // returns hash index
+    return key % capacity_; 
 }
 
 // Resizes to twice capacity.
