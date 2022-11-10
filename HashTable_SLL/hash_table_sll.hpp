@@ -1,6 +1,8 @@
 #ifndef HASH_TABLE_SLL_HPP
 #define HASH_TABLE_SLL_HPP
 
+// TODO: UPDATE THE DOCSTRINGS
+
 /*
 HashMap that utilizes a 2D array to store items.
 Uses Modulo Hash function. i.e. hash_index = key % capactiy_
@@ -31,6 +33,7 @@ Implemented Functions for HashMap:
 #include <stdexcept>
 #include <iostream>
 #include <string>
+#include <math.h>
 
 // MARK: HASHNODE CLASS ==========================================================================================================================
 
@@ -89,8 +92,10 @@ public:
 
     // ===== PUBLIC MEMBER FUNCTIONS =====
     void Clear();
+    void Display();
 
     // Insertion of node into SLL 
+    V GetLastInValue();
     void InsertNode(HashNode<K,V>* input_node);
     void InsertNode(K key, V value);
     V DeleteNode(K key);
@@ -106,11 +111,13 @@ template <typename K, typename V>
 void NodeSLL<K,V>::InsertNode(HashNode<K,V>* input_node) {
 
     // if root_ is nullptr, becomes root_
-    if (root_ == nullptr) { root_ = input_node; return; }
+    if (root_ == nullptr) { 
+        root_ = input_node; 
+        return; }
 
     // iterate down SLL and find leaf
     HashNode<K,V>* curr_node = root_;
-    while(curr_node->next_ != nullptr) { curr_node = curr_node->next; }
+    while(curr_node->next_ != nullptr) { curr_node = curr_node->next_; }
 
     // insert node into curr_node->next_
     curr_node->next_ = input_node;
@@ -126,7 +133,7 @@ void NodeSLL<K,V>::InsertNode(K key, V value) {
     // create new node
     HashNode<K,V>* new_node = new HashNode<K,V>(key, value);
 
-    // call function that inserts a node.
+    // pass to overloaded InsertNode.
     InsertNode(new_node);
 }
 
@@ -151,7 +158,7 @@ V NodeSLL<K,V>::DeleteNode(K key) {
     }
 
     // iterate till we found the node or we hit the end
-    while (curr_pointer->next_->key_ != key) { curr_pointer = curr_pointer->next; }
+    while (curr_pointer->next_->key_ != key) { curr_pointer = curr_pointer->next_; }
 
     // delete and join the before and after nodes
     HashNode<K,V>* temp = curr_pointer->next_->next_;
@@ -210,6 +217,9 @@ NodeSLL<K,V>& NodeSLL<K,V>::operator=(const NodeSLL<K,V>& source) {
     return *this;
 }
 
+// Destructor
+template <typename K, typename V>
+NodeSLL<K,V>::~NodeSLL() { Clear(); }
 
 // Helper function for Destructor
 template <typename K, typename V>
@@ -230,6 +240,34 @@ void NodeSLL<K,V>::Clear() {
     size_ = 0;
 }
 
+// Prints out all of the nodes in the SLL
+template <typename K, typename V>
+void NodeSLL<K,V>::Display() {
+    
+    // initialize ptr and count
+    HashNode<K,V>* ptr_to_curr = root_; unsigned int count = 0;
+
+    // prints all nodes
+    printf("\n");
+    while (ptr_to_curr != nullptr) {
+        printf("Pos:  %u\tKey:  %s\tValue:  %s", count, std::to_string(ptr_to_curr->key_).c_str(), std::to_string(ptr_to_curr->value_).c_str());
+        ptr_to_curr = ptr_to_curr->next_; count++;
+    }
+    printf("\n");
+}
+
+// Gets last in value in the SLL
+template <typename K, typename V>
+V NodeSLL<K,V>::GetLastInValue() {
+
+    // iterates through till last node
+    HashNode<K,V>* ptr_to_curr = root_;
+    while (ptr_to_curr->next_ != nullptr) { ptr_to_curr = ptr_to_curr->next_; }
+
+    // returns value in the node before nullptr
+    return ptr_to_curr->value_;
+}
+
 // MARK: HASHMAP CLASS ==========================================================================================================================
 
 // HashNode class which is a collection of HashNodes
@@ -240,7 +278,7 @@ public:
     // ===== CONSTRUCTORS AND DESTRUCTORS =====
     HashMap<K,V>();
     HashMap<K,V>(const HashMap<K,V>& source);
-    HashMap<K,V>(unsigned int size);
+    HashMap<K,V>(unsigned int capacity, unsigned int size, unsigned int capacity_growth = 2, double load_factor = 0.7);
     HashMap<K,V>& operator=(const HashMap<K,V>& source);
     ~HashMap<K,V>();
 
@@ -254,6 +292,8 @@ public:
     // ===== GETTERS AND SETTERS =====
     bool IsEmpty() const { return size_ == 0; }
     unsigned int Size() const { return size_; }
+    void SetCapactiyGrowthRate(unsigned int new_rate) { kCapacityGrowthFactor = new_rate; }
+    void SetLoadFactor(double new_factor) { kMaxLoadFactor = new_factor; }
 
     void Display();
 
@@ -262,19 +302,23 @@ private:
     // ===== PRIVATE HELPER FUNCTIONS ======
 
     void Grow();
-    std::pair<HashNode<K,V>*, unsigned int> SearchForNode(K key);
+    NodeSLL<K,V>* SearchForNode(K key);
 
     // Clear function that helps destructor.
     void Clear();
 
     // ===== PRIVATE MEMBERS ===== 
 
-    // initialize array of SLL pointers 
-    NodeSLL<K,V>** arr_[capacity];
+    // Array of pointers to NodeSLLs
+    NodeSLL<K,V> **arr_;
 
-    // copy over size of HashMap.
+    // capacity and size of HashMap.
+    unsigned int capacity_ = 20;
     unsigned int size_ = 0;
-    const unsigned int capacity = 20;
+
+    // consts: Default Capcaity Growth Factor and Max Load Factor.
+    double kCapacityGrowthFactor = 2.0;
+    double kMaxLoadFactor = 0.7;
 
 };
 
@@ -282,18 +326,28 @@ private:
 
 // Default Constructor for HashMap
 template <typename K, typename V>
-HashMap<K,V>::HashMap() {}
+HashMap<K,V>::HashMap() {
+
+    // initialize array of HashMap
+    arr_ = new NodeSLL<K,V>* [capacity_];
+    for (unsigned int i = 0 ; i < capacity_; i++) { arr_[i] = nullptr; }
+}
+
+// Paramerized Constructor for HashMap 
+template<typename K, typename V>
+HashMap<K,V>::HashMap(unsigned int capacity, unsigned int size, unsigned int capacity_growth, double load_factor)
+: size_(size), capacity_(capacity), kCapacityGrowthFactor(capacity_growth), kMaxLoadFactor(load_factor) {
+    
+    // initialize array of HashMap
+    arr_ = new NodeSLL<K,V>* [capacity_];
+    for (unsigned int i = 0 ; i < capacity_; i++) { arr_[i] = nullptr; }
+}
 
 // Copy Constructor for HashMap
 template <typename K, typename V>
 HashMap<K,V>::HashMap(const HashMap<K,V>& source) {
     *this = source;
 }
-
-// Paramerized Constructor for HashMap for capacity and size
-// Defaults to capacity_growth = 2 and load_factor = 0.7.
-template<typename K, typename V>
-HashMap<K,V>::HashMap(unsigned int size): size_(size) {}
 
 // Copy Assighment Constructor for HashMap
 template<typename K, typename V>
@@ -307,122 +361,159 @@ HashMap<K,V>& HashMap<K,V>::operator=(const HashMap<K,V>& source) {
 
     // Copy over private members.
     size_ = source->size_;
+    capacity_ = source->capacity_;
 
-    // Deep copy of source->sll_
-    NodeSLL<K,V>* sll_(source->sll_);
+    // Deep copy of arr_
+    for (unsigned int i = 0; i < capacity_; i++) {
+        
+        // check if the pos referrred to is empty
+        if (source->arr_[i] != nullptr) {
+            
+            // Copy create a new node SLL and insert
+            arr_[i]  = new NodeSLL<K,V>(source->arr_[i]);
+        }
+    }
 
     return *this;
 }
 
-// Destructor 
+// Destructor that calls Clear()
 template<typename K, typename V>
 HashMap<K,V>::~HashMap<K,V>() { Clear(); }
 
-// Clear Function
+// Clear Function 
 template<typename K, typename V>
 void HashMap<K,V>::Clear() {
 
-    // call NodeSLL sll_'s Clear function.
-    sll_->Clear();
+    // call NodeSLL's Clear for all in arr_ function.
+    for (unsigned int i = 0; i < capacity_; i++) {
+        arr_[i]->Clear();
+        arr_[i] = nullptr;
+    }
 
-    // remove dangling pointers
-    sll_ = nullptr;
-
-    // make size 0 again.
+    // Revert to size = 0 and capacity = 20.
     size_ = 0;
+    capacity_ = 20;
+
+    // make new arr_
+    NodeSLL<K,V>** new_arr;
+    new_arr = new NodeSLL<K,V>* [capacity_];
+    for (unsigned int i = 0; i < capacity_; i++) { new_arr[i] = nullptr; }
+
+    // Transfer Ownership
+    arr_ = new_arr;
 }
 
 // MARK: HASHMAP PUBLIC MEMBER FUNCTION DEFINITIONS ==========================================================================================================================
 
-// // Hashfunction that returns index in arr_ for an input key
-// template<typename K, typename V>
-// unsigned int HashMap<K,V>::HashFunction(K key) {
+// Hashfunction that returns index in arr_ for an input key
+template<typename K, typename V>
+unsigned int HashMap<K,V>::HashFunction(K key) {
 
-//     // Throw error if unable to carry out modulo
-//     try { unsigned int res = key % capacity_; return res; }
-//     catch (...) { throw std::runtime_error("Invalid key for modulo hash func! (most likely you entered a 0 as a key)"); }
-    
-//     return 0;
-// }
+    // returns 0 if the key is 0 to avoid modulo UB.
+    if (key == 0) { return 0; }
 
-// // Resizes to twice capacity.
-// template<typename K, typename V>
-// void HashMap<K,V>::Grow(){
-
-//     // initializes new array of capacity_ * capacity growth factor.
-//     HashNode<K,V>** temp_arr = new HashNode<K,V>* [capacity_ * kCapacityGrowthFactor];
-//     for (unsigned int i = 0 ; i < capacity_ * 2; i++) { temp_arr[i] = nullptr; }
-
-//     // transfers pointers old arr to new arr
-//     for (unsigned int i = 0 ; i < capacity_; i++) { 
-//         temp_arr[i] = arr_[i];
-
-//         //remove dangling ptrs
-//         arr_[i] = nullptr;
-//     }
-
-//     // transfer ownership
-//     arr_ = temp_arr;
-//     temp_arr = nullptr;
-
-//     // update private members
-//     capacity_ = capacity_ * 2;
-// }
+    // returns hash index
+    return key % capacity_; 
+}
 
 // Inserts a key value pair
 template<typename K, typename V>
-void HashMap<K,V>::InsertNode (K key, V value) {
+void HashMap<K,V>::InsertNode(K key, V value) { 
 
-    // Calls InsertNode - SLL's member funct
-    sll_->InsertNode(key, value);
+    // pass to overloaded inserter
+    HashNode<K,V>* new_node = new HashNode<K,V>(key, value);
+    InsertNode(new_node); 
+}
+
+// Overloaded insert when given a node
+template<typename K, typename V>
+void HashMap<K,V>::InsertNode (HashNode<K,V>* input_node) { 
+    
+    // Calls Grow() function to keep load factor low
+    if (size_ == static_cast<unsigned int>(capacity_ * kMaxLoadFactor)) { Grow(); }
+
+    // insert into the arr_
+    arr_[HashFunction(input_node->key_)]->InsertNode(input_node); 
+    
+    // increment size_
+    size_++;
 }
 
 // Deletes a key-value pair from HashMap
 template<typename K, typename V>
-V HashMap<K,V>::DeleteNode(K key){ return sll_->DeleteNode(key); }
+V HashMap<K,V>::DeleteNode(K key){
 
+    // Call SearchForNode to find node via key. 
+    NodeSLL<K,V>* found_SLL = SearchForNode(key); 
 
-// Function that returns pointer and index pair in arr_   
-template<typename K, typename V>
-std::pair<HashNode<K,V>*, unsigned int> HashMap<K,V>::SearchForNode(K key) {
-
-    
-    }
-
-    // returns pair of pointer and hash_index
-    std::pair<HashNode<K,V>*, unsigned int> res = std::make_pair(found_node, hash_index);
-    return res;
+    // Deletes node and returns V value.
+    size_--; return found_SLL->DeleteNode(key); 
 }
 
-// Function that searches and returns value of node.
+// Function that searches and returns value of all nodes in key.
 template<typename K, typename V>
 V HashMap<K,V>::GetValue (K key) {
 
     // Call SearchForNode to find node via key. 
-    std::pair<HashNode<K,V>*, unsigned int> found_pair;
-    found_pair = SearchForNode(key); 
+    NodeSLL<K,V>* found_SLL = SearchForNode(key); 
 
-    // returns value
-    HashNode<K,V>* found_node = found_pair.first;
-    
-    return found_node->value_;
+    // returns value of last node in.
+    return found_SLL->GetLastInValue();
 }
 
 // displays all stored key value pairs
 template<typename K, typename V>
 void HashMap<K,V>::Display(){
-    printf("\n");
 
     // prints out all HashNodes that are not nullptr
+    printf("\n");
     for(unsigned int i = 0 ; i < capacity_ ; i++) {
         if (arr_[i] != nullptr) {
-            printf("Key:\t\t%s\t\tValue:\t\t%s\n", std::to_string(arr_[i]->key_).c_str(), std::to_string(arr_[i]->value_).c_str());
+            arr_[i]->Display();
         }
     }
-    
+    printf("-------------------------------------------------------------------------");
     // prints out info on capacity growth rate and load factor
-    printf("\nSize of HashMap:  %u", size_);
+    printf("\nCapacity Growth Rate:  %u\tMax Load Factor:  %.2f", kCapacityGrowthFactor, kMaxLoadFactor);
     printf("\n");
+}
+
+// MARK: HASHMAP PRIVATE MEMBER FUNCTION DEFINITIONS ==========================================================================================================================
+
+// Function that returns entire NodeSLL at certain hash_index
+template<typename K, typename V>
+NodeSLL<K,V>* HashMap<K,V>::SearchForNode(K key) { 
+    
+    // throws exception if there was nullptr found
+    if (arr_[HashFunction(key)] == nullptr) { throw std::runtime_error("The node is not found!"); }
+    
+    return arr_[HashFunction(key)];
+}
+
+// Resizes to new capacity. Rounds up.
+template<typename K, typename V>
+void HashMap<K,V>::Grow(){
+
+    // initializes new array of new capacity.
+    double new_capacity = std::ceil(capacity_ * kCapacityGrowthFactor);
+    NodeSLL<K,V>** temp_arr = new NodeSLL<K,V>* [(int)new_capacity];
+    for (unsigned int i = 0 ; i < new_capacity; i++) { temp_arr[i] = nullptr; }
+
+    // transfers pointers old arr to new arr
+    for (unsigned int i = 0 ; i < capacity_; i++) { 
+        temp_arr[i] = arr_[i];
+
+        //remove dangling ptrs
+        arr_[i] = nullptr;
+    }
+
+    // transfer ownership
+    arr_ = temp_arr;
+    temp_arr = nullptr;
+
+    // update private members
+    capacity_ = new_capacity;
 }
 
 #endif

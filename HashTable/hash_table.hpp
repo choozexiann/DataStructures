@@ -31,6 +31,7 @@ Implemented Functions for HashMap:
 #include <stdexcept>
 #include <iostream>
 #include <string>
+#include <cmath>
 
 // MARK: HASHNODE CLASS ==========================================================================================================================
 
@@ -76,7 +77,7 @@ public:
 
     // ===== CONSTRUCTORS AND DESTRUCTORS =====
     HashMap<K,V>();
-    HashMap<K,V>(unsigned int capacity, unsigned int size, unsigned int capacity_growth = 2, double load_factor = 0.7);
+    HashMap<K,V>(unsigned int capacity, unsigned int size, double capacity_growth = 2.0, double load_factor = 0.7);
     HashMap<K,V>& operator=(const HashMap<K,V>& source);
     ~HashMap<K,V>();
 
@@ -114,7 +115,7 @@ private:
     unsigned int size_ = 0;
 
     // consts: Default Capcaity Growth Factor and Max Load Factor.
-    unsigned int kCapacityGrowthFactor = 2;
+    double kCapacityGrowthFactor = 2.0;
     double kMaxLoadFactor = 0.7;
 
 };
@@ -133,7 +134,7 @@ HashMap<K,V>::HashMap() {
 // Paramerized Constructor for HashMap for capacity and size
 // Defaults to capacity_growth = 2 and load_factor = 0.7.
 template<typename K, typename V>
-HashMap<K,V>::HashMap(unsigned int capacity, unsigned int size, unsigned int capacity_growth, double load_factor): 
+HashMap<K,V>::HashMap(unsigned int capacity, unsigned int size, double capacity_growth, double load_factor): 
 capacity_(capacity), size_(size), kCapacityGrowthFactor(capacity_growth), kMaxLoadFactor(load_factor) {
 
     // initialize array of HashMap
@@ -206,13 +207,14 @@ unsigned int HashMap<K,V>::HashFunction(K key) {
     return key % capacity_; 
 }
 
-// Resizes to twice capacity.
+// Resizes to new capacity. Rounds up.
 template<typename K, typename V>
 void HashMap<K,V>::Grow(){
 
-    // initializes new array of capacity_ * capacity growth factor.
-    HashNode<K,V>** temp_arr = new HashNode<K,V>* [capacity_ * kCapacityGrowthFactor];
-    for (unsigned int i = 0 ; i < capacity_ * kCapacityGrowthFactor; i++) { temp_arr[i] = nullptr; }
+    // initializes new array of new capacity.
+    double new_capacity = ceil(capacity_ * kCapacityGrowthFactor);
+    HashNode<K,V>** temp_arr = new HashNode<K,V>* [(int)new_capacity];
+    for (unsigned int i = 0 ; i < new_capacity; i++) { temp_arr[i] = nullptr; }
 
     // transfers pointers old arr to new arr
     for (unsigned int i = 0 ; i < capacity_; i++) { 
@@ -227,7 +229,7 @@ void HashMap<K,V>::Grow(){
     temp_arr = nullptr;
 
     // update private members
-    capacity_ = capacity_ * kCapacityGrowthFactor;
+    capacity_ = new_capacity;
 }
 
 // Inserts a key value pair
@@ -268,6 +270,9 @@ void HashMap<K,V>::InsertNode (K key, V value) {
             hash_index %= capacity_;
         }
     }
+
+    // increment size
+    size_++;
 }
 
 // Deletes a key-value pair from HashMap
