@@ -85,7 +85,7 @@ class NodeSLL {
 public:
 
     // ===== CONSTRUCTORS AND DESTRUCTORS =====
-    NodeSLL() = default;
+    NodeSLL();
     NodeSLL(const NodeSLL<K,V>& source);
     NodeSLL<K,V>& operator=(const NodeSLL<K,V>& source);
     ~NodeSLL();
@@ -101,10 +101,18 @@ public:
     V DeleteNode(K key);
 
 private:
-    HashNode<K,V>* root_ = nullptr;
-    unsigned int size_ = 0;
+    HashNode<K,V>* root_;
+    unsigned int size_;
 };
 
+// Default Constructor 
+template <typename K, typename V>
+NodeSLL<K,V>::NodeSLL() {
+
+    // initialize private member vars
+    root_ = nullptr;
+    size_ = 0;
+}
 
 // Insertion of node into SLL when given node.
 template <typename K, typename V>
@@ -224,13 +232,15 @@ NodeSLL<K,V>::~NodeSLL() { Clear(); }
 // Helper function for Destructor
 template <typename K, typename V>
 void NodeSLL<K,V>::Clear() {
-    HashNode<K,V>* head = root_;
 
     // iteratively deletes HashNodes as it progresses through SLL
-    while (head) {
-        HashNode<K,V>* temp = head->next_;
-        delete head;
-        head = temp;
+    HashNode<K,V>* head = root_;
+    if (head != nullptr) {
+        while (head) {
+            HashNode<K,V>* temp = head->next_;
+            delete head;
+            head = temp;
+        }
     }
 
     // removes dangling pointer
@@ -330,7 +340,7 @@ HashMap<K,V>::HashMap() {
 
     // initialize array of HashMap
     arr_ = new NodeSLL<K,V>* [capacity_];
-    for (unsigned int i = 0 ; i < capacity_; i++) { arr_[i] = nullptr; }
+    for (unsigned int i = 0 ; i < capacity_; i++) { arr_[i] = new NodeSLL<K,V>(); }
 }
 
 // Paramerized Constructor for HashMap 
@@ -340,7 +350,7 @@ HashMap<K,V>::HashMap(unsigned int capacity, unsigned int size, unsigned int cap
     
     // initialize array of HashMap
     arr_ = new NodeSLL<K,V>* [capacity_];
-    for (unsigned int i = 0 ; i < capacity_; i++) { arr_[i] = nullptr; }
+    for (unsigned int i = 0 ; i < capacity_; i++) { arr_[i] = new NodeSLL<K,V>(); }
 }
 
 // Copy Constructor for HashMap
