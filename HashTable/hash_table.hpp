@@ -79,6 +79,7 @@ public:
     HashMap<K,V>();
     HashMap<K,V>(unsigned int capacity, unsigned int size, double capacity_growth = 2.0, double load_factor = 0.7);
     HashMap<K,V>& operator=(const HashMap<K,V>& source);
+    HashMap<K,V>(const HashMap<K,V>& source);
     ~HashMap<K,V>();
 
     // ===== PUBLIC MEMBER FUNCTIONS =====
@@ -130,6 +131,12 @@ HashMap<K,V>::HashMap() {
     for (unsigned int i = 0 ; i < capacity_; i++) { arr_[i] = nullptr; }
 }
 
+// Copy Constructor for HashMap
+template <typename K, typename V>
+HashMap<K,V>::HashMap(const HashMap<K,V>& source) {
+    *this = source;
+}
+
 // Paramerized Constructor for HashMap for capacity and size
 // Defaults to capacity_growth = 2 and load_factor = 0.7.
 template<typename K, typename V>
@@ -160,7 +167,7 @@ HashMap<K,V>& HashMap<K,V>::operator=(const HashMap<K,V>& source) {
     kMaxLoadFactor = source.kMaxLoadFactor;
 
     // Deep copy of source->arr_
-    arr_ = new HashNode<K,V>* [source.capacity_];
+    arr_ = new HashNode<K,V>* [capacity_];
 
     for (unsigned int i = 0 ; i < capacity_; i++) {
 
@@ -172,6 +179,9 @@ HashMap<K,V>& HashMap<K,V>::operator=(const HashMap<K,V>& source) {
             HashNode<K,V>* new_node = new HashNode<K,V>(ptr_to_source_node->key_, ptr_to_source_node->value_);
             arr_[i] = new_node;
         }
+
+        // if node is empty, make arr_[i] nullptr
+        else { arr_[i] = nullptr; }
     }
 
     return *this;
@@ -272,9 +282,6 @@ void HashMap<K,V>::InsertNode (K key, V value) {
             hash_index %= capacity_;
         }
     }
-
-    // increment size
-    size_++;
 }
 
 // Deletes a key-value pair from HashMap
@@ -366,7 +373,7 @@ void HashMap<K,V>::Display(){
     
     // prints out info on capacity growth rate and load factor
     printf("\nCapacity Growth Rate:  %f\tMax Load Factor:  %.2f", kCapacityGrowthFactor, kMaxLoadFactor);
-    printf("\nCapacity:  %u\tSize:  %.2f", capacity_, size_);
+    printf("\nCapacity:  %u\tSize:  %u", capacity_, size_);
     printf("\n");
 }
 
