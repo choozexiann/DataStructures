@@ -42,8 +42,8 @@ class HashNode {
 public:
     // constructors
     HashNode<K,V>() = default;
-    HashNode<K,V>(const HashNode<K,V>* source);
-    HashNode<K,V>& operator= (const HashNode<K,V>* source);
+    HashNode<K,V>(const HashNode<K,V>& source);
+    HashNode<K,V>& operator= (const HashNode<K,V>& source);
     ~HashNode<K,V>() = default;
 
     // paremeterized constructor
@@ -56,20 +56,20 @@ public:
 
 // HashNode Copy Constructor
 template <typename K, typename V>
-HashNode<K,V>::HashNode(const HashNode<K,V>* source) {
+HashNode<K,V>::HashNode(const HashNode<K,V>& source) {
     *this = source;
 }
 
 // HashNode Copy Assignment Constructor 
 template <typename K, typename V>
-HashNode<K,V>& HashNode<K,V>::operator=(const HashNode<K,V>* source) {
+HashNode<K,V>& HashNode<K,V>::operator=(const HashNode<K,V>& source) {
 
     // check and return if lhs == rhs
     if (this == &source) { return *this; }
 
     // copy over private members - we do not copy over next_ as it is meaningless.
-    key_ = source->key_;
-    value_ = source->value_;
+    key_ = source.key_;
+    value_ = source.value_;
 
     return *this;
 }
@@ -85,7 +85,7 @@ class NodeSLL {
 public:
 
     // ===== CONSTRUCTORS AND DESTRUCTORS =====
-    NodeSLL();
+    NodeSLL() = default;
     NodeSLL(const NodeSLL<K,V>& source);
     NodeSLL<K,V>& operator=(const NodeSLL<K,V>& source);
     ~NodeSLL();
@@ -102,18 +102,9 @@ public:
     V DeleteNode(K key);
 
 private:
-    HashNode<K,V>* root_;
-    unsigned int size_;
+    HashNode<K,V>* root_ = nullptr;
+    unsigned int size_ = 0;
 };
-
-// Default Constructor 
-template <typename K, typename V>
-NodeSLL<K,V>::NodeSLL() {
-
-    // initialize private member vars
-    root_ = nullptr;
-    size_ = 0;
-}
 
 // Insertion of node into SLL when given node.
 template <typename K, typename V>
@@ -203,25 +194,26 @@ NodeSLL<K,V>& NodeSLL<K,V>::operator=(const NodeSLL<K,V>& source) {
     if (source.root_ == nullptr) { return *this; }
 
     // deep copy root
-    HashNode<K,V>* root_ = new HashNode<K,V>(source->root_);
+    root_ = new HashNode<K,V>(*source.root_);
 
     // iterate through source SLL and continuously deepcopy
-    HashNode<K,V>* source_curr_node = source->root_->next_;
-    HashNode<K,V>* this_curr_node = source->root_->next_;
+    HashNode<K,V>* source_curr_node = source.root_->next_;
+    HashNode<K,V>* this_curr_node = source.root_->next_;
     while (source_curr_node != nullptr) {
 
         // initialize temp pointer to a new hashnode.
-        HashNode<K,V>* temp = new HashNode<K,V>(source_curr_node);
+        HashNode<K,V>* temp = new HashNode<K,V>(*source_curr_node);
 
         // update curr_node's next field
         this_curr_node->next_ = temp;
 
-        // increment current node
+        // increment nodes
         this_curr_node = temp;
+        source_curr_node = source_curr_node->next_;
     }
 
     // copy over private members.
-    unsigned int size_ = source->size_;
+    unsigned int size_ = source.size_;
 
     return *this;
 }
@@ -378,6 +370,13 @@ HashMap<K,V>& HashMap<K,V>::operator=(const HashMap<K,V>& source) {
     kCapacityGrowthFactor = source.kCapacityGrowthFactor;
     kMaxLoadFactor = source.kMaxLoadFactor;
 
+    // init arr_ again.
+    NodeSLL<K,V>** new_arr = new NodeSLL<K,V>* [capacity_];
+    for (unsigned int i = 0; i < capacity_; i++) { new_arr[i] = nullptr; }
+
+    // Transfer Ownership
+    arr_ = new_arr; new_arr = nullptr;
+
     // Deep copy of arr_
     for (unsigned int i = 0; i < capacity_; i++) {
         
@@ -385,13 +384,12 @@ HashMap<K,V>& HashMap<K,V>::operator=(const HashMap<K,V>& source) {
         NodeSLL<K,V>* ptr_to_source_nodeSLL = source.arr_[i];
 
         // Copy over nodeSLL with new.
-        if (ptr_to_source_nodeSLL != nullptr) {
-            NodeSLL<K,V>* temp = new NodeSLL<K,V>();
-            temp = ptr_to_source_nodeSLL;
+        if (!ptr_to_source_nodeSLL->IsEmpty()) {
+            NodeSLL<K,V>* temp = new NodeSLL<K,V>(*ptr_to_source_nodeSLL);
             arr_[i] = temp;
         }
 
-        // if no nodeSLL is empty, make arr_[i] nullptr
+        // if nodeSLL is empty, make arr_[i] nullptr
         else { arr_[i] = nullptr; }
     }
     return *this;
@@ -419,13 +417,7 @@ void HashMap<K,V>::Clear() {
     size_ = 0;
     capacity_ = 20;
 
-    // make new arr_
-    NodeSLL<K,V>** new_arr;
-    new_arr = new NodeSLL<K,V>* [capacity_];
-    for (unsigned int i = 0; i < capacity_; i++) { new_arr[i] = nullptr; }
-
-    // Transfer Ownership
-    arr_ = new_arr;
+    arr_ = nullptr;
 }
 
 // MARK: HASHMAP PUBLIC MEMBER FUNCTION DEFINITIONS ==========================================================================================================================
@@ -477,7 +469,7 @@ V HashMap<K,V>::DeleteNode(K key){
 
 // Function that searches and returns value of all nodes in key.
 template<typename K, typename V>
-V HashMap<K,V>::GetValue (K key) {
+V HashMap<K,V>::GetValue(K key) {
 
     // Call SearchForNode to find node via key. 
     NodeSLL<K,V>* found_SLL = SearchForNode(key); 
