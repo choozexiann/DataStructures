@@ -92,7 +92,7 @@ public:
 
     // ===== PUBLIC MEMBER FUNCTIONS =====
     void Clear();
-    void Display();
+    void Display() const;
     bool IsEmpty() { return root_ == nullptr; }
 
     // Insertion of node into SLL 
@@ -198,7 +198,7 @@ NodeSLL<K,V>& NodeSLL<K,V>::operator=(const NodeSLL<K,V>& source) {
 
     // iterate through source SLL and continuously deepcopy
     HashNode<K,V>* source_curr_node = source.root_->next_;
-    HashNode<K,V>* this_curr_node = source.root_->next_;
+    HashNode<K,V>* this_curr_node = root_->next_;
     while (source_curr_node != nullptr) {
 
         // initialize temp pointer to a new hashnode.
@@ -245,14 +245,14 @@ void NodeSLL<K,V>::Clear() {
 
 // Prints out all of the nodes in the SLL
 template <typename K, typename V>
-void NodeSLL<K,V>::Display() {
+void NodeSLL<K,V>::Display() const {
     
     // initialize ptr and count
     HashNode<K,V>* ptr_to_curr = root_; unsigned int count = 0;
 
     // prints all nodes
     while (ptr_to_curr != nullptr) {
-        printf("Key:  %s\tPos:  %u\tValue:  %s", std::to_string(ptr_to_curr->key_).c_str(), count, std::to_string(ptr_to_curr->value_).c_str());
+        printf("Key:  %s\tPos:  %u\tValue:  %s\tAddress:  %p\tNext:  %p", std::to_string(ptr_to_curr->key_).c_str(), count, std::to_string(ptr_to_curr->value_).c_str(), (void*)ptr_to_curr, (void*)ptr_to_curr->next_);
         ptr_to_curr = ptr_to_curr->next_; count++;
         printf("\n");
     }
