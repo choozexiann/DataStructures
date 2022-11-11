@@ -183,7 +183,6 @@ HashMap<K,V>& HashMap<K,V>::operator=(const HashMap<K,V>& source) {
         // if node is empty, make arr_[i] nullptr
         else { arr_[i] = nullptr; }
     }
-
     return *this;
 }
 

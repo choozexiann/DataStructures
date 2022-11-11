@@ -93,6 +93,7 @@ public:
     // ===== PUBLIC MEMBER FUNCTIONS =====
     void Clear();
     void Display();
+    bool IsEmpty() { return root_ == nullptr; }
 
     // Insertion of node into SLL 
     V GetLastInValue();
@@ -258,10 +259,10 @@ void NodeSLL<K,V>::Display() {
     HashNode<K,V>* ptr_to_curr = root_; unsigned int count = 0;
 
     // prints all nodes
-    printf("\n");
     while (ptr_to_curr != nullptr) {
-        printf("Pos:  %u\tKey:  %s\tValue:  %s", count, std::to_string(ptr_to_curr->key_).c_str(), std::to_string(ptr_to_curr->value_).c_str());
+        printf("Key:  %s\tPos:  %u\tValue:  %s", std::to_string(ptr_to_curr->key_).c_str(), count, std::to_string(ptr_to_curr->value_).c_str());
         ptr_to_curr = ptr_to_curr->next_; count++;
+        printf("\n");
     }
     printf("\n");
 }
@@ -320,7 +321,7 @@ private:
     // ===== PRIVATE MEMBERS ===== 
 
     // Array of pointers to NodeSLLs
-    NodeSLL<K,V> **arr_;
+    NodeSLL<K,V> **arr_ = nullptr;
 
     // capacity and size of HashMap.
     unsigned int capacity_ = 20;
@@ -370,20 +371,29 @@ HashMap<K,V>& HashMap<K,V>::operator=(const HashMap<K,V>& source) {
     Clear();
 
     // Copy over private members.
-    size_ = source->size_;
-    capacity_ = source->capacity_;
+    size_ = source.size_;
+    capacity_ = source.capacity_;
+
+    // consts: Default Capcaity Growth Factor and Max Load Factor.
+    kCapacityGrowthFactor = source.kCapacityGrowthFactor;
+    kMaxLoadFactor = source.kMaxLoadFactor;
 
     // Deep copy of arr_
     for (unsigned int i = 0; i < capacity_; i++) {
         
-        // check if the pos referrred to is empty
-        if (source->arr_[i] != nullptr) {
-            
-            // Copy create a new node SLL and insert
-            arr_[i]  = new NodeSLL<K,V>(source->arr_[i]);
-        }
-    }
+        // Check if source_arr_ index contains actual nodeSLL
+        NodeSLL<K,V>* ptr_to_source_nodeSLL = source.arr_[i];
 
+        // Copy over nodeSLL with new.
+        if (ptr_to_source_nodeSLL != nullptr) {
+            NodeSLL<K,V>* temp = new NodeSLL<K,V>();
+            temp = ptr_to_source_nodeSLL;
+            arr_[i] = temp;
+        }
+
+        // if no nodeSLL is empty, make arr_[i] nullptr
+        else { arr_[i] = nullptr; }
+    }
     return *this;
 }
 
@@ -396,10 +406,14 @@ template<typename K, typename V>
 void HashMap<K,V>::Clear() {
 
     // call NodeSLL's Clear for all in arr_ function.
-    for (unsigned int i = 0; i < capacity_; i++) {
-        arr_[i]->Clear();
-        arr_[i] = nullptr;
-    }
+
+        // check if arr_ is defined 
+        if (arr_) {
+            for (unsigned int i = 0; i < capacity_; i++) {
+                arr_[i]->Clear();
+                arr_[i] = nullptr;
+            }
+        }
 
     // Revert to size = 0 and capacity = 20.
     size_ = 0;
@@ -479,13 +493,14 @@ void HashMap<K,V>::Display(){
     // prints out all HashNodes that are not nullptr
     printf("\n");
     for(unsigned int i = 0 ; i < capacity_ ; i++) {
-        if (arr_[i] != nullptr) {
+        if (!arr_[i]->IsEmpty()) {
             arr_[i]->Display();
         }
     }
     printf("-------------------------------------------------------------------------");
     // prints out info on capacity growth rate and load factor
-    printf("\nCapacity Growth Rate:  %u\tMax Load Factor:  %.2f", kCapacityGrowthFactor, kMaxLoadFactor);
+    printf("\nCapacity Growth Rate:  %f\tMax Load Factor:  %.2f", kCapacityGrowthFactor, kMaxLoadFactor);
+    printf("\nCapacity:  %u\tSize:  %u", capacity_, size_);
     printf("\n");
 }
 
@@ -508,7 +523,7 @@ void HashMap<K,V>::Grow(){
     // initializes new array of new capacity.
     double new_capacity = std::ceil(capacity_ * kCapacityGrowthFactor);
     NodeSLL<K,V>** temp_arr = new NodeSLL<K,V>* [(int)new_capacity];
-    for (unsigned int i = 0 ; i < new_capacity; i++) { temp_arr[i] = nullptr; }
+    for (unsigned int i = 0 ; i < new_capacity; i++) { temp_arr[i] = new NodeSLL<K,V>(); }
 
     // transfers pointers old arr to new arr
     for (unsigned int i = 0 ; i < capacity_; i++) { 
