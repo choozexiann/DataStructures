@@ -92,7 +92,6 @@ public:
     unsigned int Size() const { return size_; }
     void SetCapactiyGrowthRate(unsigned int new_rate) { kCapacityGrowthFactor = new_rate; }
     void SetLoadFactor(double new_factor) { kMaxLoadFactor = new_factor; }
-
     void Display();
 
 private:
@@ -153,23 +152,26 @@ HashMap<K,V>& HashMap<K,V>::operator=(const HashMap<K,V>& source) {
     Clear();
 
     // Copy over private members.
-    capacity_ = source->capacity_;
-    size_ = source->size_;
+    capacity_ = source.capacity_;
+    size_ = source.size_;
 
     // consts: Default Capcaity Growth Factor and Max Load Factor.
-    kCapacityGrowthFactor = source->kCapacityGrowthFactor;
-    kMaxLoadFactor = source->kMaxLoadFactor;
+    kCapacityGrowthFactor = source.kCapacityGrowthFactor;
+    kMaxLoadFactor = source.kMaxLoadFactor;
 
     // Deep copy of source->arr_
-    arr_ = new HashNode<K,V>* [source->capacity_];
+    arr_ = new HashNode<K,V>* [source.capacity_];
 
     for (unsigned int i = 0 ; i < capacity_; i++) {
 
         // Check if source_arr_ index contains actual node
-        HashNode<K,V>* ptr_to_source_node = source->arr_[i];
+        HashNode<K,V>* ptr_to_source_node = source.arr_[i];
 
         // Copy over node with new.
-        if (ptr_to_source_node != nullptr) { HashNode<K,V>* new_node = new HashNode<K,V>(ptr_to_source_node->key_, ptr_to_source_node->value_); }
+        if (ptr_to_source_node != nullptr) { 
+            HashNode<K,V>* new_node = new HashNode<K,V>(ptr_to_source_node->key_, ptr_to_source_node->value_);
+            arr_[i] = new_node;
+        }
     }
 
     return *this;
@@ -363,9 +365,13 @@ void HashMap<K,V>::Display(){
     }
     
     // prints out info on capacity growth rate and load factor
-    printf("\nCapacity Growth Rate:  %u\tMax Load Factor:  %.2f", kCapacityGrowthFactor, kMaxLoadFactor);
+    printf("\nCapacity Growth Rate:  %f\tMax Load Factor:  %.2f", kCapacityGrowthFactor, kMaxLoadFactor);
+    printf("\nCapacity:  %u\tSize:  %.2f", capacity_, size_);
     printf("\n");
 }
+
+
+
 
 #endif
 
