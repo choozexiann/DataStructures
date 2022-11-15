@@ -28,45 +28,12 @@ Implemented Functions for HashMap:
     void Display();
 */
 
+#include "HashNode.hpp"
+
 #include <stdexcept>
 #include <iostream>
 #include <string>
 #include <cmath>
-
-// MARK: HASHNODE CLASS ==========================================================================================================================
-
-template <typename K, typename V>
-class HashNode {
-public:
-    // constructors and destructors
-    HashNode<K,V>() = default;
-    HashNode<K,V>& operator= (const HashNode<K,V>& source);
-    ~HashNode<K,V>() = default;
-
-    // paremeterized constructor
-    HashNode<K,V>(K key, V value);
-
-    K key_;
-    V value_;
-};
-
-// HashNode Copy Assignment Constructor 
-template <typename K, typename V>
-HashNode<K,V>& HashNode<K,V>::operator=(const HashNode<K,V>& source) {
-
-    // check and return if lhs == rhs
-    if (this == &source) { return *this; }
-
-    // copy over private members
-    key_ = source->key_;
-    value_ = source->value_;
-
-    return *this;
-}
-
-//  HashNode parameterized constructor
-template <typename K, typename V>
-HashNode<K,V>::HashNode(K key, V value) : key_(key), value_(value) {}
 
 // MARK: HASHMAP CLASS ==========================================================================================================================
 
