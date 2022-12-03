@@ -1,4 +1,4 @@
-# DataStructures
+# DataStructures and CTCI C++ Solutions
 ## Implemented DataStructures in C++
 1. HashTable / HashMap with 2D array implementation
 - Working!
@@ -9,7 +9,8 @@
 
 ## CTCI Questions
 1. Chapter1
-- In Progress
+- DONE!
+2. Chapter2
 
 
 
