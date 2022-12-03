@@ -20,7 +20,6 @@ void RemoveDuplicates(std::list<T> input_list) {
 
         // look ahead and delete one in advance of iter
         for (auto it = ++curr; it != --input_list.end(); it++) {
-            std::cout << *it << '\n';
 //            if (++it == input_list.end()) { break; }
 
             // check to see if dupe. If dupe we delete

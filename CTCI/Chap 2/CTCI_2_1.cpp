@@ -1,6 +1,9 @@
+/* Remove Dups! Write code to remove duplicates from an unsorted linked list. */
+
 #include <cassert>
 #include <map>
 #include <list>
+#include <iostream>
 
 
 // Plan: progress through the LL and node down the node datas in a temp buffer
@@ -10,6 +13,7 @@ template <typename T>
 void RemoveDuplicates(std::list<T> input_list) {
 
     if (input_list.empty()) { return; }
+
     // initialize map to store counts in input_list
     std::map<T,int> counter;
 
@@ -17,7 +21,7 @@ void RemoveDuplicates(std::list<T> input_list) {
     for (auto curr = input_list.begin(); curr != input_list.end(); curr++) {
 
         // check for contains. Removes if it does
-        if (counter.count(*curr)) {
+        if (counter.count(*(curr + 1))) {
 
             // remove element in list
             auto temp = curr++;
@@ -44,6 +48,7 @@ int main() {
     lst.push_back(2);
     RemoveDuplicates(lst);
     assert(lst.size() == 4);
+    std::cout << "done" << '\n';
 
     std::list<int> lst2;
     lst2.push_back(3);
