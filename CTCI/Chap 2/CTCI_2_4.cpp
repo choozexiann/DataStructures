@@ -61,12 +61,11 @@ void insertNode(Node*& head, int input_data) {
 /**
  * insertNode - [inserts a node into list to replace head]
  * @param head [ptr to head of list]
- * @param sub_head [ptr to the head of list to be added]
- * @param sub_end [ptr to the end of list to be added]
+ * @param n [ptr to the node to be added]
 */
-void insertNode(Node*& head, Node* sub_head, Node* sub_end) {
-    sub_end->next = head;
-    head = sub_head;
+void insertNode(Node*& head, Node* n) {
+    n->next = head;
+    head = n;
 }
 
 /** deleteList - [deletes the entire list given head]
@@ -82,70 +81,50 @@ void deleteList(Node* head) {
 
 // MARK: SOLUTION ===============================================================================================================================================================
 
-// 3 pointers one to go through list, 1 runner, 1 buffer
+// Method 2: iterate through list and store in 2 different buffers.
 // S: O(N)
 // T: O(N)
 /**
- * partitionList [ partitions list such that the values above the given pivot value is to the right of the pivot]
+ * partitionList1 [ partitions list such that the values above the given pivot value is to the right of the pivot]
  * @param head [head of list]
  * @param pivot_value [ value to parition the list on]
 */
-void partitionList(Node*& head, int pivot_value){
+void partitionList1(Node*& head, int pivot_value){
 
     if (head == nullptr) { throw std::invalid_argument("head pointer is invalid!"); }
 
-    Node* slow_ptr = head;
-    Node* runner = slow_ptr;
+    Node* runner = head;
 
     // buffer to accumualte the elements which are greater than pivot value which will be inserted at end of LL.
-    Node* buffer = nullptr;
+    Node* less_buffer = nullptr;
+    Node* more_buffer = nullptr;
+    Node* tail_of_less = nullptr;
 
-    // stop iteration at last element
-    while(slow_ptr->next != nullptr && slow_ptr != nullptr){
+    while (runner->next != nullptr) {
 
-        // passes if the slow ptr is lower than pivot value.
-        if (slow_ptr->data <= pivot_value) { slow_ptr = slow_ptr->next; continue; }
-
-        // runner runs and checks for l elements in partition. Returns when runner is last element in l element LL
-        while (runner->next != nullptr && runner->next->data >= pivot_value) {
-            runner = runner->next;
-        }
-
-        // save sub LL to buffer and point slow to runner
-        if (runner != slow_ptr) {
-
-            // detach sub LL
-            Node* sub_ll = slow_ptr;
+        // send to less_buffer if node is lesser
+        if (runner->data < pivot_value) { 
             Node* temp = runner->next;
             runner->next = nullptr;
+            insertNode(less_buffer, runner);
+            if (tail_of_less == nullptr) { tail_of_less = less_buffer; }
+            runner = temp;
+            }
 
-            // insert the subLL into bufer
-            insertNode(buffer, slow_ptr, runner);
-
-            // point slow_ptr into the next l element value.
-            slow_ptr = temp;
-            runner = slow_ptr;
+        // send to more_buffer of >= to pivot value
+        else {
+            Node* temp = runner->next;
+            runner->next = nullptr;
+            insertNode(more_buffer, runner);
+            runner = temp;
         }
-        else if (slow_ptr->next != nullptr && slow_ptr != nullptr) { slow_ptr = slow_ptr->next; runner = slow_ptr; }
     }
 
+    // join the two buffers
+    tail_of_less->next = more_buffer;
+    head = less_buffer;
 
-    // join back the elements
-    slow_ptr->next = buffer;
-
-    head = slow_ptr;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 int main() {
@@ -157,13 +136,71 @@ int main() {
     }
 
     printList(head);
-    // int partition_val = randomRange(0,10);
-    int partition_val = 5;
+    int partition_val = randomRange(0,10);
     std::cout << "\nparition val will be: " << partition_val << '\n';
-    partitionList(head, partition_val);
+    partitionList1(head, partition_val);
 
     printList(head);
     deleteList(head);
 
     return 0;
 }
+
+// Essentially this method was way too complicated with the head and end edge cases being disgustingly hard to code. with that, I shall just do the simplest solution that comes to mind which will 
+// still be O(N) in terms of both space and time, but definitely longer than the method i hoped to do above.
+
+// // 3 pointers one to go through list, 1 runner, 1 buffer
+// // S: O(N)
+// // T: O(N)
+// /**
+//  * partitionList [ partitions list such that the values above the given pivot value is to the right of the pivot]
+//  * @param head [head of list]
+//  * @param pivot_value [ value to parition the list on]
+// */
+// void partitionList(Node*& head, int pivot_value){
+
+//     if (head == nullptr) { throw std::invalid_argument("head pointer is invalid!"); }
+
+//     Node* slow_ptr = head;
+//     Node* runner = slow_ptr;
+
+//     // buffer to accumualte the elements which are greater than pivot value which will be inserted at end of LL.
+//     Node* buffer = nullptr;
+
+//     // stop iteration at last element
+//     while(slow_ptr->next != nullptr && slow_ptr != nullptr){
+
+//         // passes if the slow ptr is lower than pivot value.
+//         if (slow_ptr->data <= pivot_value) { slow_ptr = slow_ptr->next; continue; }
+
+//         // runner runs and checks for l elements in partition. Returns when runner is last element in l element LL
+//         while (runner->next != nullptr && runner->next->data >= pivot_value) {
+//             runner = runner->next;
+//         }
+
+//         // save sub LL to buffer and point slow to runner
+//         if (runner != slow_ptr) {
+
+//             // detach sub LL
+//             Node* sub_ll = slow_ptr;
+//             Node* temp = runner->next;
+//             runner->next = nullptr;
+
+//             // insert the subLL into bufer
+//             insertNode(buffer, slow_ptr, runner);
+
+//             // point slow_ptr into the next l element value.
+//             slow_ptr = temp;
+//             runner = slow_ptr;
+//         }
+//         else if (slow_ptr->next != nullptr && slow_ptr != nullptr) { slow_ptr = slow_ptr->next; runner = slow_ptr; }
+//     }
+
+
+//     // join back the elements
+//     slow_ptr->next = buffer;
+
+//     head = slow_ptr;
+
+
+// }
