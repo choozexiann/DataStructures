@@ -11,6 +11,8 @@
 1. Chapter1
 - DONE!
 2. Chapter2
+- DONE!
+- future work to try and work on 2.6 for other methods besides floyd's algo.
 
 
 
