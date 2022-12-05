@@ -18,7 +18,7 @@ struct Node {
 // MARK: HELPER FUNCTIONS ================================================================================================================================================
 
 /**
- * insertNode [inserts node into list]
+ * @brief insertNode [inserts node into list]
  * @param head [head of list]
  * @param n [node ptr to inserted node]
 */
@@ -58,7 +58,6 @@ void deleteList(Node* head) {
  * @param head2 [head of list 2]
  * @return [bool on whether they are intersecting and refer to same node]
 */
-
 bool isIntersecting(Node* head1, Node* head2) {
 
     // link the two together
