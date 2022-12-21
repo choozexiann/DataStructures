@@ -8,10 +8,11 @@ This means that it should be in the free store? I'm not too sure but I will code
 I am ripping off tusharchugh's repo here: https://github.com/TusharChugh/ctci-modern_cplusplus/blob/master/include/stacks_queues/three_one.h
 */
 
-
+#include <typeinfo>
 #include <vector> 
 #include <stdexcept>
 #include <iostream>
+#include <iterator>
 
 
 
@@ -41,7 +42,7 @@ public:
     */
     explicit StackArray( size_type num_stacks, size_type stack_capacity )
         : num_stacks_( num_stacks ), stack_capacities_( num_stacks, stack_capacity ), 
-        sizes_( num_stacks ), data_( num_stacks * stack_capacity ) {}
+        sizes_( num_stacks ), data_( num_stacks * stack_capacity ) { }
 
 
     /**
@@ -63,6 +64,7 @@ private:
 
     // ===== USINGS ======
     using iterator = typename std::vector<T>::iterator;
+    using size_iterator = typename std::vector<size_type>::iterator;
 
     // ===== PRIVATE DATA MEMBERS =====
 
@@ -85,8 +87,13 @@ private:
     */
     size_type indexOfTop (size_type stack_id) const {
 
-        // offset is 
-        size_type offset = stack_id * stack_capacities_.at[stack_id];
+        // offset for fixed stack 
+        size_type offset = 0;
+        size_iterator curr = stack_capacities_.begin();
+        std::advance( curr, stack_id );
+        for ( size_iterator it = stack_capacities_.begin(); it != ++curr && it != stack_capacities_.end(); it++ ) {
+            offset += stack_capacities_.at( stack_id );
+        }
         size_type size = sizes_.at(stack_id);
 
         return offset + size - 1;
@@ -181,8 +188,9 @@ public:
 
 int main() {
 
-
-    StackArray test = StackArray<int>( 3, 100 );
+    int magic1 = 3;
+    int magic2 = 100;
+    StackArray test = StackArray<int>( magic1, magic2 );
     test.push(0, 10);
     test.push(1, 10);
     test.push(1, 10);
