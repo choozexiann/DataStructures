@@ -89,9 +89,9 @@ private:
 
         // offset for fixed stack 
         size_type offset = 0;
-        size_iterator curr = stack_capacities_.begin();
+        size_iterator curr = stack_capacities_.cbegin();
         std::advance( curr, stack_id );
-        for ( size_iterator it = stack_capacities_.begin(); it != ++curr && it != stack_capacities_.end(); it++ ) {
+        for ( size_iterator it = stack_capacities_.cbegin(); it != ++curr && it != stack_capacities_.cend(); it++ ) {
             offset += stack_capacities_.at( stack_id );
         }
         size_type size = sizes_.at(stack_id);
@@ -182,7 +182,7 @@ public:
         } 
     }
 
-};
+}; // class StackArray 
 
 
 
