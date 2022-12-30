@@ -8,35 +8,36 @@
 #include <vector>
 
 
-/**
-* @brief Node's Base Class
-*/
-template <typename T>
-class Node{
+namespace chapter_03{
+    /**
+    * @brief Node's Base Class
+    */
+    template <typename T>
+    class Node{
 
-private:
-    T value_;
+    private:
+        T value_;
 
-public:
+    public:
 
-    // ===== CLASS ADMIN =====
-    Node<T>() {}
-    Node<T>(const T& value): value_(value) {}
-    Node<T>(const Node<T>& source) : value_(source.getValue()) {}
-    Node<T>& operator=(const Node<T>& source);
+        // ===== CLASS ADMIN =====
+        Node<T>() {}
+        Node<T>(const T& value): value_(value) {}
+        Node<T>(const Node<T>& source) : value_(source.getValue()) {}
+        Node<T>& operator=(const Node<T>& source);
 
-    Node<T>(const Node<T>&& source) : value_(source.getValue()) {};
-    Node<T>& operator=(Node<T>&& source);
+        Node<T>(const Node<T>&& source) : value_(source.getValue()) {};
+        Node<T>& operator=(Node<T>&& source);
 
-    virtual ~Node<T>() {}
+        virtual ~Node<T>() {}
 
-    // ===== PUBLIC MEMBER FUNCTIONS =====
+        // ===== PUBLIC MEMBER FUNCTIONS =====
 
-    bool operator==(const Node& source) { return source.getValue() == value_; }
-    T getValue() const { return value_; } 
-    void setValue(const T& data) { value_ = data; }
+        bool operator==(const Node& source) { return source.getValue() == value_; }
+        T getValue() const { return value_; } 
+        void setValue(const T& data) { value_ = data; }
 
-}; // class Node
+    }; // class Node
 
 
 template <typename T>
@@ -58,6 +59,7 @@ Node<T>& Node<T>::operator=(Node<T>&& source) {
 
 
     
+}; // namespace chapter_03
 
 
 #endif

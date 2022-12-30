@@ -6,40 +6,45 @@
 
 #include "Node.h"
 
-/**
- * @brief SinglyLinkedList Node that inherits from base class of Node.
-*/
-template <typename T>
-class SinglyLinkedNode : public Node<T>{
+namespace chapter_03{
 
-private:
-    SinglyLinkedNode<T>* next_ = nullptr;
-    
-public:
+    /**
+     * @brief SinglyLinkedList Node that inherits from base class of Node.
+    */
+    template <typename T>
+    class SinglyLinkedNode : public Node<T>{
 
-    // ===== CLASS ADMIN =====
+    private:
+        SinglyLinkedNode<T>* next_ = nullptr;
+        
+    public:
 
-    SinglyLinkedNode() = default;
-    SinglyLinkedNode<T>(T value, SinglyLinkedNode<T>* next_ptr = nullptr) 
-        : Node<T>(value), next_(next_ptr) {}
+        // ===== CLASS ADMIN =====
 
-    SinglyLinkedNode<T>(const SinglyLinkedNode<T>& source) 
-        : Node<T>::value_(source.getValue()), next_(source.getNext()) {}
+        SinglyLinkedNode() = default;
+        SinglyLinkedNode<T>(T value, SinglyLinkedNode<T>* next_ptr = nullptr) 
+            : Node<T>(value), next_(next_ptr) {}
 
-    SinglyLinkedNode<T>& operator=(const SinglyLinkedNode<T>& source);
+        SinglyLinkedNode<T>(const SinglyLinkedNode<T>& source) 
+            : Node<T>::value_(source.getValue()), next_(source.getNext()) {}
 
-    SinglyLinkedNode<T>(SinglyLinkedNode<T>&& source) 
-        : Node<T>::value_(source.getValue()), next_(source.getNext()) { source.next_ = nullptr; }
+        SinglyLinkedNode<T>& operator=(const SinglyLinkedNode<T>& source);
 
-    SinglyLinkedNode<T>& operator=(SinglyLinkedNode<T>&& source);
+        SinglyLinkedNode<T>(SinglyLinkedNode<T>&& source) 
+            : Node<T>::value_(source.getValue()), next_(source.getNext()) { source.next_ = nullptr; }
 
-    ~SinglyLinkedNode<T>() { next_ = nullptr; }
+        SinglyLinkedNode<T>& operator=(SinglyLinkedNode<T>&& source);
 
-    // ===== PUBLIC MEMBER FUNCTIONS =====
-    SinglyLinkedNode<T>* getNext() const { return next_; }
-    void setNext(SinglyLinkedNode<T>* next_ptr) { next_ = next_ptr; }
+        ~SinglyLinkedNode<T>() { next_ = nullptr; }
 
-}; // class SinglyLinkedNode
+        // ===== PUBLIC MEMBER FUNCTIONS =====
+        SinglyLinkedNode<T>* getNext() const { return next_; }
+        void setNext(SinglyLinkedNode<T>* next_ptr) { next_ = next_ptr; }
+
+        bool operator <(const SinglyLinkedNode<T>& rhs) { return Node<T>::getValue() < rhs->getValue(); }
+        bool operator <=(const SinglyLinkedNode<T>& rhs) { return Node<T>::getValue() <= rhs->getValue(); }
+
+    }; // class SinglyLinkedNode
 
 // MARK: SINGLYLINKEDNODE ASSIGNMENT OPERATORS ================================================================================= 
 template <typename T>
@@ -52,5 +57,6 @@ SinglyLinkedNode<T>& SinglyLinkedNode<T>::operator=(const SinglyLinkedNode<T>& s
     return *this;
 }
 
+}; // namespace chapter_03
 
 #endif // SINGLYLINKEDNODE_H

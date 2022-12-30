@@ -41,6 +41,9 @@ namespace chapter_03{
         SinglyLinkedNode<T>* getNext() const { return next_; }
         void setNext(SinglyLinkedNode<T>* next_ptr) { next_ = next_ptr; }
 
+        bool operator <(const SinglyLinkedNode<T>& rhs) { return Node<T>::getValue() < rhs->getValue(); }
+        bool operator <=(const SinglyLinkedNode<T>& rhs) { return Node<T>::getValue() <= rhs->getValue(); }
+
     }; // class SinglyLinkedNode
 
 // MARK: SINGLYLINKEDNODE ASSIGNMENT OPERATORS ================================================================================= 
