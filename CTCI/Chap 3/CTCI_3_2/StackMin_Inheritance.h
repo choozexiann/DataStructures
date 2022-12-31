@@ -3,8 +3,12 @@ which returns the minimum element? Push, pop and min should all operate in 0(1) 
 
 /* StackMin2 implemented with Inheritance */
 
+#ifndef STACKMIN_INHERITANCE_H
+#define STACKMIN_INHERITANCE_H
+
 #include <iostream>
 #include "Stack.h"
+
 
 /**
  * @brief Extends from stack class.
@@ -142,3 +146,5 @@ namespace chapter_03{
     }
 
 }; // namespace chapter_03
+
+#define

@@ -61,6 +61,7 @@ namespace chapter_03{
 
         // initialize pointers
         SinglyLinkedNode<T>* source_curr = source.getHead();
+        if (source_curr == nullptr) { head_ = nullptr; return; }
         SinglyLinkedNode<T>* curr = new SinglyLinkedNode<T>(source_curr->getValue());
         head_ = curr;
         source_curr = source_curr->getNext();
@@ -89,6 +90,9 @@ namespace chapter_03{
 
         // initialize pointers
         SinglyLinkedNode<T>* source_curr = source.getHead();
+
+        // if source is empty
+        if(source_curr == nullptr) { head_ = nullptr; return *this;}
         SinglyLinkedNode<T>* curr = new SinglyLinkedNode<T>(source_curr->getValue());
         head_ = curr;
         source_curr = source_curr->getNext();
@@ -163,10 +167,8 @@ namespace chapter_03{
     template <typename T>
     void Stack<T>::push(const T& data) {
 
-        std::cout << "[Stack Push1]" << std::endl;
         // create new node with data
-        chapter_03::SinglyLinkedNode<T>* temp_node = new SinglyLinkedNode<T>(data);
-        std::cout << "[Stack Push2]" << std::endl;
+        chapter_03::SinglyLinkedNode<T>* temp_node = new chapter_03::SinglyLinkedNode<T>(data);
 
         // add to front of stack
         temp_node->setNext(head_);

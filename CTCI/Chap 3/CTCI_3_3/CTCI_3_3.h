@@ -22,10 +22,10 @@ For the followup popat, i need to also store an array of pointers to the substac
 namespace chapter_03{
 
     /**
-     * @brief stackOfStacks houses a stack of stacks and handles the pop/push normal stack functions accordingly
+     * @brief StackOfStacks houses a stack of stacks and handles the pop/push normal stack functions accordingly
     */
     template <typename T>
-    class stackOfStacks {
+    class StackOfStacks {
         private:
 
         // stack of stacks
@@ -39,15 +39,15 @@ namespace chapter_03{
 
         // ===== CLASS ADMIN =====
 
-        stackOfStacks<T>();
-        stackOfStacks<T>(const stackOfStacks<T>& source) { *this = source; }
-        stackOfStacks<T>& operator=(const stackOfStacks<T>& source);
-        stackOfStacks<T>(const stackOfStacks<T>&& source);
-        stackOfStacks<T>& operator=(const stackOfStacks<T>&& source);
-        ~stackOfStacks<T>() { Clear(); }
+        StackOfStacks<T>();
+        StackOfStacks<T>(const StackOfStacks<T>& source) { *this = source; }
+        StackOfStacks<T>& operator=(const StackOfStacks<T>& source);
+        StackOfStacks<T>(const StackOfStacks<T>&& source);
+        StackOfStacks<T>& operator=(const StackOfStacks<T>&& source);
+        ~StackOfStacks<T>() { Clear(); }
 
         // ===== GETTERS/SETTERS ======
-        chapter_03::SimpleArray<T> getArray() { return stack_ptrs; }
+        chapter_03::SimpleArray<chapter_03::LimitedStack<T>*> getArray() { return stack_ptrs; }
         chapter_03::Stack<T> getStack() { return stacks_; }
 
         // ===== PUBLIC MEMBER FUNCTIONS =====
@@ -60,7 +60,7 @@ namespace chapter_03{
 
         void printStack();
 
-    }; // class stackOfStacks
+    }; // class StackOfStacks
 
 // MARK: CLASS ADMIN =============================================================================================
 
@@ -68,18 +68,18 @@ namespace chapter_03{
  * @brief Constructor
 */
 template <typename T>
-stackOfStacks<T>::stackOfStacks() {
+StackOfStacks<T>::StackOfStacks() {
 
     // Private Data Mems
     chapter_03::Stack<chapter_03::LimitedStack<T>> stacks_;
-    chapter_03::SimpleArray<T> stack_ptrs;
+    chapter_03::SimpleArray<chapter_03::LimitedStack<T>*> stack_ptrs;
 }
 
 /**
  * @brief Deep Copy Assignment
 */
 template <typename T>
-stackOfStacks<T>& stackOfStacks<T>::operator=(const stackOfStacks<T>& source) {
+StackOfStacks<T>& StackOfStacks<T>::operator=(const StackOfStacks<T>& source) {
     if(this == &source) { return *this; }
 
     Clear();
@@ -93,7 +93,7 @@ stackOfStacks<T>& stackOfStacks<T>::operator=(const stackOfStacks<T>& source) {
  * @brief Move Constructor
 */
 template <typename T>
-stackOfStacks<T>::stackOfStacks(const stackOfStacks<T>&& source) {
+StackOfStacks<T>::StackOfStacks(const StackOfStacks<T>&& source) {
 
     // Move Assign private mems
     stacks_ = std::move(source.getStack());
@@ -104,7 +104,7 @@ stackOfStacks<T>::stackOfStacks(const stackOfStacks<T>&& source) {
  * @brief Move Assignment
 */
 template <typename T>
-stackOfStacks<T>& stackOfStacks<T>::operator=(const stackOfStacks<T>&& source) {
+StackOfStacks<T>& StackOfStacks<T>::operator=(const StackOfStacks<T>&& source) {
 
     // Move Assign private mems
     stacks_ = std::move(source.getStack());
@@ -115,7 +115,7 @@ stackOfStacks<T>& stackOfStacks<T>::operator=(const stackOfStacks<T>&& source) {
  * @brief Helper Function to Destructor
 */
 template <typename T>
-void stackOfStacks<T>::Clear() {
+void StackOfStacks<T>::Clear() {
     stacks_.Clear();
     stack_ptrs.Clear();
 }
@@ -127,19 +127,15 @@ void stackOfStacks<T>::Clear() {
  * @return pointer to the stack we just added
 */
 template <typename T>
-chapter_03::LimitedStack<T>* stackOfStacks<T>::addStack() {
+chapter_03::LimitedStack<T>* StackOfStacks<T>::addStack() {
 
-    std::cout << "[addStack1]" << '\n';
     // Pushes new LimitedStack onto stacks_
-    chapter_03::LimitedStack<T> new_stack;
-    chapter_03::LimitedStack<T>* new_stack_ptr = &new_stack;
-    std::cout << "[addStack2]" << '\n';
-    stacks_.push(new_stack);
-    std::cout << "[addStack3]" << '\n';
+    chapter_03::LimitedStack<T>* new_stack_ptr = new chapter_03::LimitedStack<T>();
+
+    stacks_.push(*new_stack_ptr);
 
     // updates array of pointers
-    stack_ptrs.push(new_stack_ptr);
-    std::cout << "[addStack4]" << '\n';
+    stack_ptrs.push(peekTop());
 
     return new_stack_ptr;
 }
@@ -149,49 +145,50 @@ chapter_03::LimitedStack<T>* stackOfStacks<T>::addStack() {
  * @return Pointer to top stack
 */
 template <typename T>
-chapter_03::LimitedStack<T>* stackOfStacks<T>::peekTop() { return stacks_.getHead()->getValueRef(); }
+chapter_03::LimitedStack<T>* StackOfStacks<T>::peekTop() { return stacks_.getHead()->getValueRef(); }
 
 /**
  * @brief Pushes Data onto stack of stacks. Creates new stack if it is full
 */
 template <typename T>
-void stackOfStacks<T>::push(T data) {
+void StackOfStacks<T>::push(T data) {
 
-    std::cout << "[Push]1" << std::endl;
     // stacks_ is empty or top stack is full
     if(stacks_.isEmpty() || peekTop()->isFull() ) { addStack(); }
-    std::cout << "[Push]2" << std::endl;
     peekTop()->push(data);
 }
 
 /**
- * @brief pops element off of stackofstacks. If empty will remove stack and jump to other one 
+ * @brief pops element off of StackOfStacks. If empty will remove stack and jump to other one 
  * @return Data at element
 */
 template <typename T>
-T stackOfStacks<T>::pop() {
+T StackOfStacks<T>::pop() {
 
-    if(stacks_.isEmpty()) { throw std::runtime_error("stackOfStacks is literally empty"); }
+    if(stacks_.isEmpty()) { throw std::runtime_error("StackOfStacks is literally empty"); }
     
+    T temp = peekTop()->pop();
+
     // topStack is empty
     if(peekTop()->isEmpty()) {
         stacks_.pop();
         stack_ptrs.pop();
     }
 
-    return peekTop()->pop();
+    return temp;
 }
 
 /**
- * @brief pops at certain stack in stackofstacks
+ * @brief pops at certain stack in StackOfStacks
  * @param idx idx of stack to pop
- * @return data at top of stack in stackofstacks
+ * @return data at top of stack in StackOfStacks
 */
 template <typename T>
-T stackOfStacks<T>::popAt(int idx) { return stack_ptrs.getElement(idx)->pop(); }
+T StackOfStacks<T>::popAt(int idx) { return stack_ptrs.getElement(idx)->pop(); }
 
 template <typename T>
-void stackOfStacks<T>::printStack() {
+void StackOfStacks<T>::printStack() {
+
     for(int i = 0; i < stack_ptrs.getSize(); i++ ) {
         stack_ptrs.getElement(i)->printStack();
     }

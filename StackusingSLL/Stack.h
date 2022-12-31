@@ -8,6 +8,7 @@ Templated implementation of a stack which utilizes SinglyLinkedNodes
 #include "SinglyLinkedNode.h"
 #include <stdexcept>
 #include <string>
+#include <iostream>
 
 namespace chapter_03{
     /**
@@ -27,8 +28,11 @@ namespace chapter_03{
         Stack<T>() = default;
         Stack<T>(const Stack<T>& source);
         Stack<T>& operator=(const Stack<T>& source);
+        Stack<T>& operator=(Stack<T>&& source);
+        Stack<T>(Stack<T>&& source);
 
         ~Stack<T>() { Clear(); }
+
         void Clear(); 
 
         // ===== PUBLIC MEMBER FUNCTIONS ======
@@ -40,7 +44,9 @@ namespace chapter_03{
         virtual T pop();
         virtual T peek();
 
-        void printStack();
+        void nullHead() { head_ = nullptr; }
+        void setSize(int size) { stackSize_ = size; }
+        void printStack() const;
 
     }; // class Stack
 
@@ -55,6 +61,7 @@ namespace chapter_03{
 
         // initialize pointers
         SinglyLinkedNode<T>* source_curr = source.getHead();
+        if (source_curr == nullptr) { head_ = nullptr; return; }
         SinglyLinkedNode<T>* curr = new SinglyLinkedNode<T>(source_curr->getValue());
         head_ = curr;
         source_curr = source_curr->getNext();
@@ -83,6 +90,9 @@ namespace chapter_03{
 
         // initialize pointers
         SinglyLinkedNode<T>* source_curr = source.getHead();
+
+        // if source is empty
+        if(source_curr == nullptr) { head_ = nullptr; return *this;}
         SinglyLinkedNode<T>* curr = new SinglyLinkedNode<T>(source_curr->getValue());
         head_ = curr;
         source_curr = source_curr->getNext();
@@ -95,7 +105,6 @@ namespace chapter_03{
 
             // iterate through the source stack
             source_curr = source_curr->getNext();
-
         }
 
         return *this;
@@ -111,8 +120,44 @@ namespace chapter_03{
             delete head_;
             head_ = temp;
         }
+        stackSize_ = 0;
     }
 
+    /**
+     * @brief Move Assignment
+    */
+    template <typename T>
+    Stack<T>& Stack<T>::operator=(Stack<T>&& source) { 
+        
+        // copy over priv members
+        stackSize_ = source.getSize();
+        
+        // steal ptrs
+        head_ = source.getHead();
+
+        // null out source
+        source.setSize(0);
+        source.nullHead();
+
+        return *this;
+    }
+
+    /**
+     * @brief Move Contructor
+    */
+    template <typename T>
+    Stack<T>::Stack(Stack<T>&& source) { 
+        
+        // copy over priv members
+        stackSize_ = source.getSize();
+        
+        // steal ptrs
+        head_ = source.getHead();
+
+        // null out source
+        source.nullHead();
+        source.setSize(0);
+    }
 
     // MARK: PUBLIC MEMBER FUNCTION DEFINITIONS ================================================================================
 
@@ -123,7 +168,7 @@ namespace chapter_03{
     void Stack<T>::push(const T& data) {
 
         // create new node with data
-        chapter_03::SinglyLinkedNode<T>* temp_node = new SinglyLinkedNode<T>(data);
+        chapter_03::SinglyLinkedNode<T>* temp_node = new chapter_03::SinglyLinkedNode<T>(data);
 
         // add to front of stack
         temp_node->setNext(head_);
@@ -188,7 +233,7 @@ namespace chapter_03{
      * @brief prints all values in the stack if possible
     */
     template <typename T>
-    void Stack<T>::printStack() {
+    void Stack<T>::printStack() const {
         SinglyLinkedNode<T>* curr = getHead();
         unsigned int count = 0;
 

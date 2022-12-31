@@ -89,8 +89,6 @@ SimpleArray<T>& SimpleArray<T>::operator= (SimpleArray&& source) {
 template <typename T>
 SimpleArray<T>::SimpleArray(SimpleArray&& source) {
 
-
-    if (this == &source) { return *this; }
     Clear();
 
     // copy priv members
@@ -100,7 +98,6 @@ SimpleArray<T>::SimpleArray(SimpleArray&& source) {
     data_ = source.getData();
     source.Clear();
 
-    return *this;
 }
 
 

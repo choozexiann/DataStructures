@@ -22,11 +22,11 @@ namespace chapter_03{
 
         // ===== CLASS ADMIN =====
         Node<T>() {}
-        Node<T>(const T& value): value_(value) {std::cout << "[node] constructor" << '\n';}
-        Node<T>(const Node<T>& source) : value_(source.getValue()) {}
+        explicit Node<T>(const T& value): value_(value) { }
+        explicit Node<T>(const Node<T>& source) : value_(source.getValue()) {}
         Node<T>& operator=(const Node<T>& source);
 
-        Node<T>(const Node<T>&& source) : value_(source.getValue()) {};
+        explicit Node<T>(const Node<T>&& source) : value_(source.getValue()) {};
         Node<T>& operator=(Node<T>&& source);
 
         virtual ~Node<T>() {}

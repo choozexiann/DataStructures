@@ -6,7 +6,7 @@
 #define NODE_H
 
 #include <vector>
-
+#include <iostream>
 
 namespace chapter_03{
     /**
@@ -22,11 +22,11 @@ namespace chapter_03{
 
         // ===== CLASS ADMIN =====
         Node<T>() {}
-        Node<T>(const T& value): value_(value) {}
-        Node<T>(const Node<T>& source) : value_(source.getValue()) {}
+        explicit Node<T>(const T& value): value_(value) { }
+        explicit Node<T>(const Node<T>& source) : value_(source.getValue()) {}
         Node<T>& operator=(const Node<T>& source);
 
-        Node<T>(const Node<T>&& source) : value_(source.getValue()) {};
+        explicit Node<T>(const Node<T>&& source) : value_(source.getValue()) {};
         Node<T>& operator=(Node<T>&& source);
 
         virtual ~Node<T>() {}
@@ -35,6 +35,7 @@ namespace chapter_03{
 
         bool operator==(const Node& source) { return source.getValue() == value_; }
         T getValue() const { return value_; } 
+        T* getValueRef() { return &(value_); } 
         void setValue(const T& data) { value_ = data; }
 
     }; // class Node

@@ -23,8 +23,17 @@ namespace chapter_03{
         // ===== CLASS ADMIN =====
 
         SinglyLinkedNode() = default;
-        SinglyLinkedNode<T>(const T& value, SinglyLinkedNode<T>* next_ptr = nullptr) 
+
+
+        SinglyLinkedNode<T>(const T& value, SinglyLinkedNode<T>* next_ptr) 
             : Node<T>(value), next_(next_ptr) {}
+
+        SinglyLinkedNode<T>(const T& value) : Node<T>(value) {
+            next_ = nullptr;
+        }
+
+        // SinglyLinkedNode<T>(const T& value) 
+        //     : Node<T>(value), next_(nullptr) {}
 
         SinglyLinkedNode<T>(const SinglyLinkedNode<T>& source) 
             : Node<T>::value_(source.getValue()), next_(source.getNext()) {}
