@@ -6,7 +6,9 @@
 - Working!
 3. Stack using SLL
 - Working!
-4. AVL Tree
+4. Queue using SLL
+- Working!
+5. AVL Tree
 
 
 ## CTCI Questions in C++
@@ -16,6 +18,7 @@
 - DONE!
 - future work to try and work on 2.6 for other methods besides floyd's algo.
 3. Chapter3
-
+- DONE!
+4. Chapter4 
 
 
