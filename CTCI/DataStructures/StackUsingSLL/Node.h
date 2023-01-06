@@ -26,7 +26,7 @@ namespace chapter_03{
         explicit Node<T>(const Node<T>& source) : value_(source.getValue()) {}
         Node<T>& operator=(const Node<T>& source);
 
-        explicit Node<T>(const Node<T>&& source) : value_(source.getValue()) {};
+        explicit Node<T>(Node<T>&& source) : value_(source.getValue()) {};
         Node<T>& operator=(Node<T>&& source);
 
         virtual ~Node<T>() {}

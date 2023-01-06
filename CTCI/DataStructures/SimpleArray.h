@@ -9,11 +9,14 @@
 namespace chapter_03{
     template <typename T>
     class SimpleArray {
+
         private:
             unsigned int capacity_ = 2;
             unsigned int size_ = 0;
             T* data_ = new T[capacity_];
 
+            // ====== PRIVATE MEMBER FUNCS =====
+            void resize();
         public:
 
             // ===== CLASS ADMIN =====
@@ -33,12 +36,12 @@ namespace chapter_03{
             void setCapacity(unsigned int new_capacity) { capacity_ = new_capacity; }
 
             // ====== PUB MEM FUNCTIONS ======
-            void resize();
             void push(const T& data);
             void debugPrint() const;
             T pop();
-            T getElement(unsigned int index) const { return data_[index]; }
-
+            T getElement(unsigned int index) const { if (index > size_) return nullptr; return data_[index]; }
+            T removeElement(unsigned int index);
+            bool searchFor(const T& data);
 
     }; // class SimpleArray
 
@@ -60,7 +63,7 @@ SimpleArray<T>& SimpleArray<T>::operator= (const SimpleArray& source) {
     // iterate through source.data_ and copy over.
     data_ = new T[capacity_];
     T* source_data = source.getData();
-    for( unsigned int i = 0; i < source.getsize(); i += 1) { data_[i] = source_data[i]; }
+    for( unsigned int i = 0; i < source.getSize(); i += 1) { data_[i] = source_data[i]; }
 
     return *this;
 }
@@ -79,7 +82,9 @@ SimpleArray<T>& SimpleArray<T>::operator= (SimpleArray&& source) {
 
     // Move pointers around
     data_ = source.getData();
-    source.Clear();
+
+    // null out source
+    source.data_ = nullptr;
     return *this;
 }
 
@@ -96,8 +101,9 @@ SimpleArray<T>::SimpleArray(SimpleArray&& source) {
 
     // Move pointers around
     data_ = source.getData();
-    source.Clear();
 
+    // null out source
+    source.data_ = nullptr;
 }
 
 
@@ -117,6 +123,7 @@ void SimpleArray<T>::push(const T& data) {
     // call resize if needed
     if (size_ == capacity_) { resize(); }
 }
+
 
 /**
  * @brief Grows the SimpleArray by twice it's size. Used when size == capacity after a push
@@ -153,6 +160,49 @@ void SimpleArray<T>::debugPrint() const {
     for (unsigned int i = 0; i < size_; i += 1) {
         printf("Element %u: \t Data: %s \n", i, std::to_string(data_[i]).c_str());
     }
+}
+
+/**
+ * @brief removes element at a certain index and deallocates
+ * @returns element at index
+*/
+template <typename T>
+T SimpleArray<T>::removeElement(unsigned int index){
+
+    // save data
+    T temp_value = getElement(index);
+    if (temp_value == nullptr || size_ == 0) { return nullptr; }
+
+    // iterate through source.data_ and copy over.
+    T* temp_arr = new T[capacity_];
+    unsigned int count = 0;
+    for( unsigned int i = 0; i < size_; i += 1) { 
+
+        // skips element we are copying
+        if(i == index) { continue; }
+
+        temp_arr[count] = data_[i];
+        count += 1; 
+    }
+
+    // transfer ownership
+    delete[] data_;
+    data_ = temp_arr;
+    temp_arr = nullptr;
+
+    size_ -= 1;
+}
+
+/**
+ * @brief searches for data in the array
+ * @return true false if data is in array
+*/
+template <typename T>
+bool SimpleArray<T>::searchFor(const T& data) {
+    for(unsigned int i = 0; i < size_; i += 1) {
+        if (data_[i] == data) return true;
+    }
+    return false;
 }
 
 
