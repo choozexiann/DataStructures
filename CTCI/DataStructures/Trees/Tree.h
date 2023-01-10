@@ -29,7 +29,7 @@ public:
 
     inline bool isEmpty() const { return root_ == nullptr; }
     inline BinaryNode<T>* getRoot() const { return root_; }
-    int getHeight() const;
+    int getHeight() const { return getHeight(root_); }
     
     void insert(chapter_04::BinaryNode<T>* source);
     virtual void insert(T data) { BinaryNode<T>* temp = new BinaryNode<T>(data); insert(temp); }
@@ -49,7 +49,7 @@ private:
     // ===== PRIVATE HELPER FUNCTIONS ======
     void copyPreOrder(BinaryNode<T>* node_ptr, const BinaryNode<T>* source_ptr);
     void deletePostOrder(BinaryNode<T>* node_ptr);
-    int getHeight(const BinaryNode<T>& source_node) const;
+    int getHeight(const BinaryNode<T>* source_node) const;
     void insert(BinaryNode<T>* curr, BinaryNode<T>* source);
     BinaryNode<T>* search(BinaryNode<T>* curr, T key);
     void preOrderPrint(BinaryNode<T>* curr) const; 
@@ -136,21 +136,13 @@ Tree<T>& Tree<T>::operator=(Tree<T>&& source) {
 
 // MARK: PUBLIC MEMBER FUNCTIONS =======================================================================================================
 
-/**
- * @brief gets height of tree
- * @return Max height of tree AKA number of edges from root to that particular node 
-*/
-template <typename T>
-int Tree<T>::getHeight() const {
-    return getHeight(root_);
-}
 
 /**
  * @brief helper function to getHeight()
  * @return Max height of tree AKA number of edges from root to that particular node 
 */
 template <typename T>
-int Tree<T>::getHeight(const BinaryNode<T>& source_node) const {
+int Tree<T>::getHeight(const BinaryNode<T>* source_node) const {
 
     // base case 
     if (source_node == nullptr) { return 0; }
