@@ -2,7 +2,7 @@
 /* Creates a Binary Search Tree from an array */
 /* I will implement a Min Heap. */
 
-#include "BinaryNode.h"
+#include "..\Tree.h"
 
 namespace chapter_04{
 template <typename T>
@@ -80,7 +80,7 @@ void RBTree<T>::insertHelper(BinaryNode<T>* curr_node, const T& data) {
 
     // base case 2 - there is no more left nodes, but this belongs on the left.
     if (curr_node->getValue() <= data && curr_node->getLeft() == nullptr) { curr_node->setLeft(new BinaryNode<T>(data)); return; }
-
+1
     // base case 3 - there is no more right nodes, but this belongs on the right. 
     if (curr_node->getValue() > data && curr_node->getRight() == nullptr) { curr_node->setLeft(new BinaryNode<T>(data)); return; }
     

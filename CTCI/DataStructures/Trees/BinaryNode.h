@@ -21,6 +21,7 @@ namespace chapter_04{
             // ====== CLASS ADMIN ======
             BinaryNode() = default;
             BinaryNode(const T& data) : chapter_03::Node<T>(data) {}
+            BinaryNode(const BinaryNode<T>& source) : chapter_03::Node<T>(source.getValue()) {}
             explicit BinaryNode<T>(BinaryNode<T>&& source);
             BinaryNode<T>& operator=(BinaryNode<T>&& source);
 
