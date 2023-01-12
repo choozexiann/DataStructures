@@ -79,6 +79,7 @@ void RBTree<T>::insert(const T& data) {
     BinaryNode<T>* curr_node = new BinaryNode<T>(data);
     BST<T>::insert(curr_node);
 
+    BST<T>::prettyPrint();
     BinaryNode<T>* parent = curr_node->getParent();
     BinaryNode<T>* sibling = getSibling(curr_node);
 
@@ -204,6 +205,7 @@ void RBTree<T>::RLRotate(BinaryNode<T>* curr_node) {
 */
 template <typename T>
 void RBTree<T>::rotateLeft(BinaryNode<T>* curr_node){
+    printf("before rotate"); BST<T>::prettyPrint();
 
     // get pointers
     BinaryNode<T>* parent = curr_node->getParent();
@@ -215,18 +217,23 @@ void RBTree<T>::rotateLeft(BinaryNode<T>* curr_node){
     // readjust root.
     if (root_ == grandparent) { setRoot(parent); }
 
+    // rotate by shifting pointers around. 
+
     // readjust grandparent
     if (great_grandparent != nullptr) {
     grandparent->isLeft() ? great_grandparent->setLeft(parent) : great_grandparent->setRight(parent);
     parent->setParent(great_grandparent);
     }
-    
-    // rotate by shifting pointer around. 
-    // Parent and child switch places. Now it is defiintely rotating left (it is the right child).
-    grandparent->setRight(sibling);
-    if (sibling != nullptr) { sibling->setParent(grandparent); }
+
+    // parent replaces sibling with grandparent
     parent->setLeft(grandparent);
     grandparent->setParent(parent);
+
+    //  grandparent adopts lost sibling 
+    grandparent->setRight(sibling);
+    if (sibling != nullptr) { sibling->setParent(grandparent); }
+
+    printf("after rotate"); BST<T>::prettyPrint();
 }
 
 /**
@@ -244,8 +251,6 @@ void RBTree<T>::rotateRight(BinaryNode<T>* curr_node){
     // readjust root.
     if (root_ == grandparent) { setRoot(parent);}
 
-
-
     // rotate by shifting pointer around. 
     // Parent and child switch places. Now it is defiintely rotating right (it is the left child).
     BinaryNode<T>* curr_right = curr_node->getRight();
@@ -256,9 +261,11 @@ void RBTree<T>::rotateRight(BinaryNode<T>* curr_node){
     curr_node->setParent(grandparent);
     }
 
+    // current node becomes parent's parent
     curr_node->setRight(parent);
     parent->setParent(curr_node);
 
+    // parent adopts the lost right field of curr_node
     parent->setLeft(curr_right);
     if (curr_right != nullptr) { curr_right->setParent(parent); }
 

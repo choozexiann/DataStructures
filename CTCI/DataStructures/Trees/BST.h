@@ -179,13 +179,13 @@ template <typename T>
 void BST<T>::insert(BinaryNode<T>* curr, BinaryNode<T>* source) {
 
     T source_value = source->getValue();
-    if(source_value < curr->getValue()) {
+    if(source_value <= curr->getValue()) {
     
         // inserting value is smaller than curr
         // location found
         if (curr->getLeft() == nullptr) { curr->setLeft(source); source->setParent(curr); return; }
         insert(curr->getLeft(), source);
-    }
+    }   
 
     else {
 
