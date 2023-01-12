@@ -1,10 +1,10 @@
 
-#include "Tree.h"
+#include "BST.h"
 
 
 int main() {
     
-    chapter_04::Tree<int> test;
+    chapter_04::BST<int> test;
 
     test.insert(10);
     test.insert(13);
@@ -15,10 +15,7 @@ int main() {
     test.insert(2);
     test.insert(0);
 
-    test.preOrderPrint();
-    test.search(10) == nullptr ? printf("not found") : printf("%d",test.search(10)->getValue());
-    printf("\n");
-    std::cout<< test.getHeight() << std::endl;
+    test.prettyPrint();
 
 
 return 0;

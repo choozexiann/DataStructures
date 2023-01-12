@@ -8,6 +8,9 @@ Binary Node which implements left and right fields to diff Binary nodes.
 #include <string>
 
 namespace chapter_04{
+
+    enum Colour {RED, BLACK, DOUBLE_BLACK};
+
     template <typename T>
     class BinaryNode : public chapter_03::Node<T>{
         private:
@@ -15,11 +18,12 @@ namespace chapter_04{
             BinaryNode<T>* right_ = nullptr;
             BinaryNode<T>* parent_ = nullptr;
             bool marked_ = false;
+            Colour colour_ = Colour::RED;
             void Clear() { left_ = nullptr; right_ = nullptr; parent_ = nullptr; }
             
         public:
             // ====== CLASS ADMIN ======
-            BinaryNode() = default;
+            BinaryNode() {}
             BinaryNode(const T& data) : chapter_03::Node<T>(data) {}
             BinaryNode(const BinaryNode<T>& source) : chapter_03::Node<T>(source.getValue()) {}
             explicit BinaryNode<T>(BinaryNode<T>&& source);
@@ -30,13 +34,19 @@ namespace chapter_04{
             // ===== GETTERS / SETTERS ======
             
             unsigned int getValue() const { return chapter_03::Node<T>::getValue(); }
-            void setLeft (BinaryNode<T>* ptr_to_node) { left_ = ptr_to_node; }
-            void setRight (BinaryNode<T>* ptr_to_node) { right_ = ptr_to_node; }
-            void setParent (BinaryNode<T>* ptr_to_node) { parent_ = ptr_to_node; }
-            BinaryNode<T>* getLeft () const { return left_; }
-            BinaryNode<T>* getRight () const { return right_; }
-            BinaryNode<T>* getParent () const { return parent_; }
+            inline void setLeft (BinaryNode<T>* ptr_to_node) { left_ = ptr_to_node; }
+            inline void setRight (BinaryNode<T>* ptr_to_node) { right_ = ptr_to_node; }
+            inline void setParent (BinaryNode<T>* ptr_to_node) { parent_ = ptr_to_node; }
+            inline BinaryNode<T>* getLeft () const { return left_; }
+            inline BinaryNode<T>* getRight () const { return right_; }
+            inline BinaryNode<T>* getParent () const { return parent_; }
 
+            bool isLeft() const { if(parent_ == nullptr) { return false; } return getValue()< parent_->getValue(); }
+            bool isRight() const { return !isLeft(); }
+
+            inline void setColour(Colour colour) { colour_ = colour; }
+            inline Colour getColour() const { return colour_; }
+            inline void flipColour() { colour_ == Colour::RED ? colour_ = Colour::BLACK : Colour::RED; }
             // ===== PUBLIC MEMBER FUNCTIONS =====
 
             void mark() { marked_ = true; }

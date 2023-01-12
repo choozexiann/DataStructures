@@ -1,6 +1,6 @@
 
 /*
-Tree Class which aims to be a base class for other trees such as AVL and RB trees to be derived. 
+BST Class which aims to be a base class for other BSTs such as AVL and RB BSTs to be derived. 
 */
 #pragma once
 
@@ -10,26 +10,28 @@ Tree Class which aims to be a base class for other trees such as AVL and RB tree
 
 namespace chapter_04 {
 /**
- * @brief templated Tree class which serves as a base class for other tree classes.
+ * @brief templated BST class which serves as a base class for other BST classes.
 */
 template <typename T>
-class Tree {
+class BST {
 
 public:
 
     // ===== CLASS ADMIN =====
-    Tree() = default;
-    explicit Tree(const Tree<T>& source) { this = &source; }
-    Tree<T>& operator=(const Tree<T>& source);
-    explicit Tree(Tree<T>&& source) : root_(source.getRoot()) { source.root_ = nullptr; }
-    Tree<T>& operator=(Tree<T>&& source);
-    ~Tree() { if (root_ != nullptr) deletePostOrder(root_); root_ = nullptr;}
+    BST() = default;
+    explicit BST(const BST<T>& source) { this = &source; }
+    BST<T>& operator=(const BST<T>& source);
+    explicit BST(BST<T>&& source) : root_(source.getRoot()) { source.root_ = nullptr; }
+    BST<T>& operator=(BST<T>&& source);
+    ~BST() { if (root_ != nullptr) deletePostOrder(root_); root_ = nullptr;}
 
-    // ===== PUBLIC MEMBER FUNCTIONS =====
-
-    inline bool isEmpty() const { return root_ == nullptr; }
+    // ===== GETTERS / SETTERS =====
     inline BinaryNode<T>* getRoot() const { return root_; }
+    inline void setRoot(BinaryNode<T>* data) { root_ = data; }
+    inline bool isEmpty() const { return root_ == nullptr; }
     int getHeight() const { return getHeight(root_); }
+    
+    // ===== PUBLIC MEMBER FUNCTIONS =====
     
     void insert(chapter_04::BinaryNode<T>* source);
     virtual void insert(T data) { BinaryNode<T>* temp = new BinaryNode<T>(data); insert(temp); }
@@ -38,7 +40,7 @@ public:
     void preOrderPrint() const { printf("PreOrder:\n"); preOrderPrint(root_); printf("\n"); } 
     void postOrderPrint() const { printf("PostOrder:\n"); postOrderPrint(root_); printf("\n"); } 
     void inOrderPrint() const { printf("inOrder:\n"); inOrderPrint(root_); printf("\n"); } 
-    void printTree() const { printf("Pretty Printing Tree:\n"), printTree(root_, 0); }
+    void prettyPrint() const { prettyPrint("", root_, false); }
 
 
 private:
@@ -55,12 +57,12 @@ private:
     void preOrderPrint(BinaryNode<T>* curr) const; 
     void postOrderPrint(BinaryNode<T>* curr) const; 
     void inOrderPrint(BinaryNode<T>* curr) const; 
-    void printTree(BinaryNode<T>* curr, int count) const;
+    void prettyPrint(const std::string& prefix, const BinaryNode<T>* curr, bool isLeft) const;
     
 protected:
     void Clear();
 
-}; // class Tree
+}; // class BST
 
 // MARK: CLASS ADMIN ============================================================================================================================
 
@@ -68,13 +70,13 @@ protected:
  * @brief Copy Assignment
 */
 template <typename T>
-Tree<T>& Tree<T>::operator=(const Tree<T>& source) {
+BST<T>& BST<T>::operator=(const BST<T>& source) {
 
     if (this == &source) { return *this; }
     Clear();
     if(source.isEmpty()) { return *this; }
 
-    // copy entire tree in preorder
+    // copy entire BST in preorder
     root_ = new BinaryNode<T>(source.getRoot());
     copyPreOrder(root_, source->getRoot());
 }
@@ -82,10 +84,10 @@ Tree<T>& Tree<T>::operator=(const Tree<T>& source) {
 /**
  * @brief helper function for preorder copying in constructors
  * @param node_ptr curr node it is recursing on
- * @param source_tree source tree
+ * @param source_BST source BST
 */
 template <typename T>
-void Tree<T>::copyPreOrder(BinaryNode<T>* node_ptr, const BinaryNode<T>* source_ptr) {
+void BST<T>::copyPreOrder(BinaryNode<T>* node_ptr, const BinaryNode<T>* source_ptr) {
 
     // base case
     if (source_ptr->getLeft() == nullptr && source_ptr->getRight() == nullptr) { return; }
@@ -109,7 +111,7 @@ void Tree<T>::copyPreOrder(BinaryNode<T>* node_ptr, const BinaryNode<T>* source_
  * @brief Destructor helper function
 */
 template <typename T>
-void Tree<T>::deletePostOrder(BinaryNode<T>* node_ptr){
+void BST<T>::deletePostOrder(BinaryNode<T>* node_ptr){
 
     // base case
     if (node_ptr == nullptr) { return; }
@@ -124,7 +126,7 @@ void Tree<T>::deletePostOrder(BinaryNode<T>* node_ptr){
  * @brief Move Assignment
 */
 template <typename T>
-Tree<T>& Tree<T>::operator=(Tree<T>&& source) {
+BST<T>& BST<T>::operator=(BST<T>&& source) {
     if (this == &source) { return *this; }
     Clear();
 
@@ -139,10 +141,10 @@ Tree<T>& Tree<T>::operator=(Tree<T>&& source) {
 
 /**
  * @brief helper function to getHeight()
- * @return Max height of tree AKA number of edges from root to that particular node 
+ * @return Max height of BST AKA number of edges from root to that particular node 
 */
 template <typename T>
-int Tree<T>::getHeight(const BinaryNode<T>* source_node) const {
+int BST<T>::getHeight(const BinaryNode<T>* source_node) const {
 
     // base case 
     if (source_node == nullptr) { return 0; }
@@ -156,7 +158,7 @@ int Tree<T>::getHeight(const BinaryNode<T>* source_node) const {
  * @param source pointer to a node in freestore to be inserted
 */
 template <typename T>
-void Tree<T>::insert(chapter_04::BinaryNode<T>* source) {
+void BST<T>::insert(chapter_04::BinaryNode<T>* source) {
 
     // base case
     if (root_ == nullptr) {
@@ -174,33 +176,33 @@ void Tree<T>::insert(chapter_04::BinaryNode<T>* source) {
  * @param source source node we are inserting
 */
 template <typename T>
-void Tree<T>::insert(BinaryNode<T>* curr, BinaryNode<T>* source) {
+void BST<T>::insert(BinaryNode<T>* curr, BinaryNode<T>* source) {
 
     T source_value = source->getValue();
     if(source_value < curr->getValue()) {
     
         // inserting value is smaller than curr
         // location found
-        if (curr->getLeft() == nullptr) { curr->setLeft(source); return; }
+        if (curr->getLeft() == nullptr) { curr->setLeft(source); source->setParent(curr); return; }
         insert(curr->getLeft(), source);
     }
 
     else {
 
         // location found
-        if (curr->getRight() == nullptr) { curr->setRight(source); return; }
+        if (curr->getRight() == nullptr) { curr->setRight(source); source->setParent(curr); return; }
         insert(curr->getRight(), source);
     }
 }
 
 /**
- * @brief searches helper tree for particular key. 
+ * @brief searches helper BST for particular key. 
  * @param key value to search for
  * @param curr pointer to curr node in recursion
  * @return returns pointer to the particular node w key value, else returns nullptr.
 */
 template <typename T>
-BinaryNode<T>* Tree<T>::search(BinaryNode<T>* curr, T key) {
+BinaryNode<T>* BST<T>::search(BinaryNode<T>* curr, T key) {
 
     // base case
     if (curr == nullptr) { return nullptr; }
@@ -211,10 +213,10 @@ BinaryNode<T>* Tree<T>::search(BinaryNode<T>* curr, T key) {
 }
 
 /** 
- * @brief Helper to prints out tree in preOrder
+ * @brief Helper to prints out BST in preOrder
 */
 template <typename T>
-void Tree<T>::preOrderPrint(BinaryNode<T>* curr) const {
+void BST<T>::preOrderPrint(BinaryNode<T>* curr) const {
 
     if(curr == nullptr) { return; }
     printf("%s\t", std::to_string(curr->getValue()).c_str());
@@ -223,33 +225,43 @@ void Tree<T>::preOrderPrint(BinaryNode<T>* curr) const {
 }
 
 /** 
- * @brief Helper to prints out tree in postOrderPrint
+ * @brief Helper to prints out BST in postOrderPrint
 */
 template <typename T>
-void Tree<T>::postOrderPrint(BinaryNode<T>* curr) const {
+void BST<T>::postOrderPrint(BinaryNode<T>* curr) const {
     if(curr == nullptr) { return; }
     postOrderPrint(curr->getLeft());
     postOrderPrint(curr->getRight());
     printf("%s\t", std::to_string(curr->getValue()).c_str());
 }
 /** 
- * @brief Helper to prints out tree in postOrderPrint
+ * @brief Helper to prints out BST in postOrderPrint
 */
 template <typename T>
-void Tree<T>::inOrderPrint(BinaryNode<T>* curr) const {
+void BST<T>::inOrderPrint(BinaryNode<T>* curr) const {
     if(curr == nullptr) { return; }
     inOrderPrint(curr->getLeft());
     printf("%s\t", std::to_string(curr->getValue()).c_str());
     inOrderPrint(curr->getRight());
 }
 
-// TODO: TO BE IMPLEMENTED
 /**
- * @brief pretty prints Tree 
+ * @brief pretty prints BST overloaded helper for prettyPrint
 */
 template <typename T>
-void Tree<T>::printTree(BinaryNode<T>* curr, int count) const {
+void BST<T>::prettyPrint(const std::string& prefix, const BinaryNode<T>* curr, bool isLeft) const {
 
+    if (curr == nullptr) { return; }
+
+    std::cout << prefix;
+    std::cout << (isLeft? "|--" : "^--");
+
+    // print out value of node
+    std::cout << curr->getValue() << "\n";
+
+    // recurse for next and right
+    prettyPrint(prefix + (isLeft ? "|   " : "    "), curr->getLeft(), true);
+    prettyPrint(prefix + (isLeft ? "|   " : "    "), curr->getRight(), false);
 }
 
 
